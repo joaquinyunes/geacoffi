@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#140c07" />
+    <title>GeaCofi · Café de especialidad</title>
+    <meta name="description" content="GeaCofi, café de especialidad y panadería en 9 de Julio 996. Mirá la carta y escribinos por WhatsApp." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=Fraunces:ital,wght@1,400&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body id="top" data-page="inicio">
+    <!-- Escenario WebGL fijo: fondo, imágenes del DOM como planos y postproceso -->
+    <canvas id="gl"></canvas>
+
+    <div id="ui">
+      <header id="header">
+        <a id="header-logo" href="/" aria-label="GeaCofi, inicio">GEACOFI</a>
+        <nav id="header-nav" aria-label="Principal">
+          <ul>
+            <li class="is-flipper" data-id="inicio"><a class="is-flipper-target" href="/" aria-current="page">Inicio</a></li>
+            <li class="is-flipper" data-id="detalles"><a class="is-flipper-target" href="/detalles.html">Detalles</a></li>
+            <li class="is-flipper" data-id="carta"><a class="is-flipper-target" href="/carta.html">Carta</a></li>
+            <li class="is-flipper" data-id="armar"><a class="is-flipper-target" href="/armar.html">Pedido</a></li>
+            <li class="is-flipper" data-id="eventos"><a class="is-flipper-target" href="/#eventos">Eventos</a></li>
+            <li class="is-flipper" data-id="footer"><a class="is-flipper-target" href="#footer">Contacto</a></li>
+          </ul>
+          <div id="header-line" class="dashline"></div>
+        </nav>
+      </header>
+
+      <main id="content">
+<!-- 1 · HERO -->
+        <section id="hero" class="section">
+          <div class="gl-img hero-bg" data-src="/studio/hero.jpg" data-dim="1" data-parallax="0.6"></div>
+          <div class="inner container">
+            <div class="hero-top">
+              <p class="hero-tagline sub1">Hecho para tazas. Servido en mesas.</p>
+              <h1 class="hero-logo" aria-label="GeaCofi"><span aria-hidden="true">GEACOFI</span></h1>
+            </div>
+            <p class="hero-copy body1" data-reveal>Pensado para que el momento más simple se sienta cuidado: café de especialidad y panadería que se piden sin apuro.</p>
+            <div class="hero-card glass">
+              <h4 data-reveal>Café de especialidad<br />en 9 de Julio 996.</h4>
+              <div class="dashline"></div>
+              <p class="body2"><span>La pausa más</span> <span>deliberadamente</span> <span>bien servida.</span></p>
+            </div>
+            <a class="hero-cta" href="/carta.html" aria-label="Ver la carta">
+              <span class="glow"></span><span class="border"></span>
+              <img src="/img/cafe-filtrado.webp" alt="" width="320" height="320" />
+              <span class="hero-cta-label">VER CARTA</span>
+            </a>
+          </div>
+        </section>
+
+<!-- 2 · NO ES SOLO UN CAFÉ (sección fijada, la taza 3D vive acá) -->
+        <section id="ai" class="section pinned" style="--len: 500" data-sec>
+          <div class="pin container">
+            <!-- Secuencia de 150 fotogramas (latte → vaso) guiada por el scroll; ver tools/gen-frames.py -->
+            <canvas id="seq" role="img" aria-label="De un latte con arte de gato a un vaso GEACOFFE con café salpicando"></canvas>
+            <div class="seq-shade" aria-hidden="true"></div>
+            <div class="ai-pre" data-win="0.04,0.12,0.26,0.34">
+              <h2>No es solo<br />un café.</h2>
+              <p class="body1">GeaCofi no es solo<br />una taza. Es el resultado<br />de mucho grano, agua a punto<br />y cero apuros.</p>
+            </div>
+            <div class="ai-header">
+              <h1 class="ai-title" data-win="0.62,0.7,2,3">Tostado con<br />criterio<sup>*</sup></h1>
+              <h4 class="ai-tagline" data-win="0.68,0.74,2,3">Grano de especialidad</h4>
+            </div>
+            <div class="ai-instruction sub2" data-win="0.5,0.56,0.74,0.8">
+              <span class="ring"></span>
+              <div class="dashline"></div>
+              <span>Seguí bajando</span>
+            </div>
+            <p class="ai-desc sub1">
+              <span data-win="0.74,0.79,2,3">El café hace el trabajo.</span>
+              <span data-win="0.79,0.84,2,3"> Nosotros, el resto.</span>
+              <span data-win="0.84,0.89,2,3"> La medialuna, aparte.</span>
+            </p>
+            <div class="ai-disclaimer" data-win="0.9,0.95,2,3">
+              <div class="dashline"></div>
+              <p class="sub2">* Y una pizca de paciencia.</p>
+            </div>
+          </div>
+        </section>
+
+<!-- 3 · TAN RICO QUE SE LLEVA PUESTO (texto gigante horizontal + galerías) -->
+        <section id="wearable" class="section pinned" style="--len: 520" data-sec>
+          <div class="pin">
+            <h4 class="wear-small" data-win="0.05,0.12,2,3">TAN BUENO,</h4>
+            <div class="wear-frame" data-win="0.12,0.2,0.92,0.98" aria-hidden="true">
+              <span class="dot"></span><span class="circle"></span>
+            </div>
+            <!-- escena 3D del medio: anillo de productos + granos que orbitan + sello giratorio (main.js la mueve con el scroll) -->
+            <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+              <defs>
+                <radialGradient id="bean-g" cx="35%" cy="28%" r="85%"><stop offset="0" stop-color="#9a5c2a" /><stop offset="0.55" stop-color="#4a2a14" /><stop offset="1" stop-color="#1c0d05" /></radialGradient>
+                <symbol id="bean" viewBox="0 0 100 140"><ellipse cx="50" cy="70" rx="44" ry="64" fill="url(#bean-g)" /><path d="M50 8C28 42 72 98 50 132" fill="none" stroke="#140c07" stroke-width="7" stroke-linecap="round" /><ellipse cx="32" cy="38" rx="8" ry="22" transform="rotate(18 32 38)" fill="#fff" opacity="0.14" /></symbol>
+              </defs>
+            </svg>
+            <div class="wear-scene" aria-hidden="true">
+              <div class="ws-glow"></div>
+              <div class="ws-world">
+                <div class="ws-fr" data-d="400"></div>
+                <div class="ws-fr" data-d="1300"></div>
+                <div class="ws-fr" data-d="2200"></div>
+                <div class="ws-fr" data-d="3100"></div>
+                <div class="ws-fr" data-d="4000"></div>
+                <div class="ws-fr" data-d="4800"></div>
+                <figure class="ws-card" data-x="-420" data-y="-140" data-d="700" data-r="-5"><img src="/img/cafe-filtrado.webp" alt="" loading="lazy" decoding="async" /><figcaption class="sub2">Filtrado</figcaption></figure>
+                <figure class="ws-card" data-x="400" data-y="170" data-d="1500" data-r="4"><img src="/img/medialuna.webp" alt="" loading="lazy" decoding="async" /><figcaption class="sub2">Medialuna</figcaption></figure>
+                <figure class="ws-card" data-x="-380" data-y="200" data-d="2300" data-r="-3"><img src="/img/cafe-frio.webp" alt="" loading="lazy" decoding="async" /><figcaption class="sub2">Café frío</figcaption></figure>
+                <figure class="ws-card" data-x="430" data-y="-180" data-d="3100" data-r="5"><img src="/img/tostado.webp" alt="" loading="lazy" decoding="async" /><figcaption class="sub2">Tostado</figcaption></figure>
+                <figure class="ws-card" data-x="-440" data-y="-60" data-d="3900" data-r="-4"><img src="/img/cafe-de-siempre.webp" alt="" loading="lazy" decoding="async" /><figcaption class="sub2">De siempre</figcaption></figure>
+                <figure class="ws-card" data-x="380" data-y="60" data-d="4600" data-r="3"><img src="/img/rol-de-canela.webp" alt="" loading="lazy" decoding="async" /><figcaption class="sub2">Rol de canela</figcaption></figure>
+                <div class="ws-core" data-d="5200">
+                  <svg viewBox="0 0 300 300">
+                    <defs><path id="ws-circ" d="M150 150m-112 0a112 112 0 1 1 224 0a112 112 0 1 1-224 0" /></defs>
+                    <circle cx="150" cy="150" r="146" fill="rgb(20 12 7 / 0.55)" stroke="rgb(246 229 203 / 0.35)" stroke-dasharray="2 5" />
+                    <g class="ws-spin"><text><textPath href="#ws-circ" textLength="700" lengthAdjust="spacing">PARA LLEVAR · CAFÉ DE ESPECIALIDAD · 9 DE JULIO 996 ·</textPath></text></g>
+                    <g class="ws-bean-core"><use href="#bean" x="108" y="78" width="84" height="118" /></g>
+                  </svg>
+                </div>
+              </div>
+            </div>
+            <div class="wear-col is-left" aria-hidden="true">
+              <div class="wear-col-move">
+                <div class="gl-img thumb" data-src="/studio/pastry.jpg"></div>
+                <div class="gl-img thumb" data-src="/studio/pour.jpg"></div>
+                <div class="gl-img thumb" data-src="/studio/counter.jpg"></div>
+                <div class="gl-img thumb" data-src="/studio/iced.jpg"></div>
+              </div>
+            </div>
+            <div class="wear-col is-right" aria-hidden="true">
+              <div class="wear-col-move">
+                <div class="gl-img thumb" data-src="/studio/togo.jpg"></div>
+                <div class="gl-img thumb" data-src="/studio/latte.jpg"></div>
+                <div class="gl-img thumb" data-src="/studio/espresso.jpg"></div>
+                <div class="gl-img thumb" data-src="/studio/grind.jpg"></div>
+              </div>
+            </div>
+            <p class="sr-only">Tan bueno, que se lleva puesto: pedí para llevar.</p>
+          </div>
+        </section>
+
+<!-- 9 · MOMENTOS (carrusel horizontal fijado) -->
+        <section id="momentos" class="section pinned" style="--len: 460" data-sec>
+          <div class="pin">
+            <div class="mom-track">
+              <article class="mom-item" style="--w: 44">
+                <div class="mom-clip"><div class="gl-img mom-img" data-src="/studio/pour.jpg" data-parallax="0.8"></div><h5>El primer filtrado<br />del día</h5><p class="mom-note sub2">Lento. Como debe ser.</p></div>
+              </article>
+              <article class="mom-item" style="--w: 30">
+                <div class="mom-clip"><div class="gl-img mom-img" data-src="/studio/pastry.jpg" data-parallax="0.8"></div><p class="mom-note sub2">Recién salidas.</p></div>
+              </article>
+              <article class="mom-item" style="--w: 52">
+                <div class="mom-clip"><div class="gl-img mom-img" data-src="/studio/counter.jpg" data-parallax="0.8"></div><h5>Una barra<br />con vista</h5><p class="mom-note sub2">9 de Julio 996.</p></div>
+              </article>
+              <article class="mom-item" style="--w: 30">
+                <div class="mom-clip"><div class="gl-img mom-img" data-src="/studio/iced.jpg" data-parallax="0.8"></div><p class="mom-note sub2">Frío, con hielo.</p></div>
+              </article>
+              <article class="mom-item" style="--w: 44">
+                <div class="mom-clip"><div class="gl-img mom-img" data-src="/studio/togo.jpg" data-parallax="0.8"></div><h5>Para llevar<br />y seguir</h5><p class="mom-note sub2">Se toma caminando.</p></div>
+              </article>
+            </div>
+            <div class="mom-progress" aria-hidden="true"><span></span></div>
+          </div>
+        </section>
+
+<!-- 10 · EVENTOS Y COMUNIDAD (se arma en eventos.js con los datos de negocio.js) -->
+        <section id="eventos" class="section"></section>
+
+<!-- 11 · FOOTER -->
+        <section id="footer" class="section"></section>
+      </main>
+
+      <div id="scroll-hint" class="sub2" aria-hidden="true">
+        <div class="scroll-hint-icon"><svg viewBox="0 0 13 8"><path fill="currentColor" d="M0 1.873 1.654 0l4.82 4.258L11.293 0l1.654 1.873-6.473 5.72z" /></svg></div>
+        <span>Scroll para seguir</span>
+      </div>
+      <div id="scroll-indicator" aria-hidden="true"><div class="bar"><span class="dot"></span><span class="label sub2">Menú</span></div></div>
+      <div id="cursor" aria-hidden="true"></div>
+
+      <div id="preloader" aria-hidden="true"><div class="pre-word">GEACOFI</div><div class="pre-count">0</div></div>
+    </div>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

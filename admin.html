@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>GeaCofi · Panel</title>
+  <style>
+    :root { --fondo: #faf6f0; --tinta: #2a1e17; --suave: #7a6a5e; --linea: #e3d8cb; --acento: #5a3a26; --ok: #2f6b3a; --mal: #a3322b; color-scheme: light dark; }
+    @media (prefers-color-scheme: dark) { :root { --fondo: #1d1612; --tinta: #f1e8de; --suave: #b3a395; --linea: #3a2d25; --acento: #d9b48f; --ok: #7bc48a; --mal: #ef8a82; } }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--fondo); color: var(--tinta); font: 16px/1.4 system-ui, sans-serif; }
+    main { max-width: 640px; margin: 0 auto; padding: 16px 16px 120px; }
+    h1 { font-size: 1.4rem; margin: 8px 0 16px; }
+    h2 { font-size: 1.1rem; margin: 28px 0 8px; padding-top: 16px; border-top: 1px solid var(--linea); }
+    label { display: block; font-size: .85rem; color: var(--suave); margin: 10px 0 4px; }
+    input, textarea { width: 100%; padding: 10px; font: inherit; color: inherit; background: transparent; border: 1px solid var(--linea); border-radius: 8px; }
+    input[type=checkbox] { width: auto; margin-right: 8px; }
+    .fila { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .tarjeta { border: 1px solid var(--linea); border-radius: 12px; padding: 12px; margin: 12px 0; }
+    .tarjeta img { width: 96px; height: 96px; object-fit: cover; border-radius: 8px; display: block; margin-bottom: 8px; background: var(--linea); }
+    button { font: inherit; padding: 10px 16px; border-radius: 999px; border: 1px solid var(--acento); background: transparent; color: var(--acento); cursor: pointer; }
+    button.pri { background: var(--acento); color: var(--fondo); }
+    button.peligro { border-color: var(--mal); color: var(--mal); }
+    .barra { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px; background: var(--fondo); border-top: 1px solid var(--linea); display: flex; gap: 12px; align-items: center; justify-content: center; }
+    #msg { min-height: 1.2em; font-size: .9rem; }
+    #msg.ok { color: var(--ok); } #msg.mal { color: var(--mal); }
+    .nota { font-size: .85rem; color: var(--suave); }
+  </style>
+</head>
+<body>
+  <main id="app"><p>Cargando…</p></main>
+  <script type="module" src="/admin.js"></script>
+</body>
+</html>

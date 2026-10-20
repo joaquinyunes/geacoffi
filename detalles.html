@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="es" class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#140c07" />
+    <title>Detalles · GeaCofi</title>
+    <meta name="description" content="Granos de especialidad, temperatura a punto y el cuidado detrás de cada taza de GeaCofi." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=Fraunces:ital,wght@1,400&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body id="top" data-page="detalles">
+    <!-- Escenario WebGL fijo: fondo, imágenes del DOM como planos y postproceso -->
+    <canvas id="gl"></canvas>
+
+    <div id="ui">
+      <header id="header">
+        <a id="header-logo" href="/" aria-label="GeaCofi, inicio">GEACOFI</a>
+        <nav id="header-nav" aria-label="Principal">
+          <ul>
+            <li class="is-flipper" data-id="inicio"><a class="is-flipper-target" href="/">Inicio</a></li>
+            <li class="is-flipper" data-id="detalles"><a class="is-flipper-target" href="/detalles.html" aria-current="page">Detalles</a></li>
+            <li class="is-flipper" data-id="carta"><a class="is-flipper-target" href="/carta.html">Carta</a></li>
+            <li class="is-flipper" data-id="armar"><a class="is-flipper-target" href="/armar.html">Pedido</a></li>
+            <li class="is-flipper" data-id="eventos"><a class="is-flipper-target" href="/#eventos">Eventos</a></li>
+            <li class="is-flipper" data-id="footer"><a class="is-flipper-target" href="#footer">Contacto</a></li>
+          </ul>
+          <div id="header-line" class="dashline"></div>
+        </nav>
+      </header>
+
+      <main id="content">
+<!-- 4 · DETALLES (sección fijada con panel de vidrio) -->
+        <section id="features" class="section pinned" style="--len: 400" data-sec>
+          <div class="pin">
+            <div class="feat-media">
+              <div class="gl-img feat-img" data-src="/studio/grind.jpg" data-parallax="0.5"></div>
+              <div class="gl-img feat-img" data-src="/studio/espresso.jpg" data-parallax="0.5" data-hidden="1"></div>
+              <div class="gl-img feat-img" data-src="/studio/latte.jpg" data-parallax="0.5" data-hidden="1"></div>
+            </div>
+            <div class="feat-panel glass">
+              <article class="feat-item is-active" data-i="0">
+                <div class="feat-top">
+                  <span class="feat-icon" aria-hidden="true"><svg viewBox="0 0 64 64" fill="none"><circle cx="32" cy="32" r="32" fill="#f6e5cb" opacity=".2" /><path d="M24 27l8-10 8 10h-5v13h-6V27z" fill="#f6e5cb" /><path d="M27 43h10M27 46h10M27 49h10" stroke="#f6e5cb" stroke-width="1.2" opacity=".7" /></svg></span>
+                  <p class="feat-tagline sub1">Granos de especialidad</p>
+                </div>
+                <p class="feat-desc body2">Chemex o V60: un método lento para un café que se toma sin apuro. Granos de especialidad, agua a punto y manos tranquilas.</p>
+                <div class="dashline"></div>
+                <h3 class="feat-title">Empieza por el grano</h3>
+              </article>
+              <article class="feat-item" data-i="1">
+                <div class="feat-top">
+                  <span class="feat-icon" aria-hidden="true"><svg viewBox="0 0 54 54" fill="none"><circle cx="27" cy="27" r="27" fill="#f6e5cb" opacity=".2" /><rect x="23.5" y="12" width="7" height="24" rx="3.5" fill="#f6e5cb" /><circle cx="27" cy="38.5" r="6.5" fill="#f6e5cb" /></svg></span>
+                  <p class="feat-tagline sub1">Temperatura a punto</p>
+                </div>
+                <p class="feat-desc body2">Del filtrado bien caliente al café frío con hielo, cada uno se sirve a su temperatura ideal. Tu café nunca se queda esperando.</p>
+                <div class="dashline"></div>
+                <h3 class="feat-title">Ni tibio ni quemado</h3>
+              </article>
+              <article class="feat-item" data-i="2">
+                <div class="feat-top">
+                  <span class="feat-icon" aria-hidden="true"><svg viewBox="0 0 54 54" fill="none"><circle cx="27" cy="27" r="27" fill="#f6e5cb" opacity=".2" /><circle cx="27" cy="27" r="13.8" stroke="#f6e5cb" stroke-width=".8" /><circle cx="27" cy="27" r="9" fill="#f6e5cb" /></svg></span>
+                  <p class="feat-tagline sub1">El de todos los días</p>
+                </div>
+                <p class="feat-desc body2">El café de siempre, con el mismo cuidado que el de especialidad. Sin vueltas, bien hecho y a punto de tomarse.</p>
+                <div class="dashline"></div>
+                <h3 class="feat-title">Sin vueltas</h3>
+              </article>
+            </div>
+            <div class="feat-slider sub2" aria-hidden="true">
+              <div class="feat-slider-labels"><span>Caliente</span><span>Tibio</span><span>Con hielo</span></div>
+              <div class="feat-slider-bar"><span></span></div>
+            </div>
+            <div class="feat-extra body3">
+              <span>Seguinos en Instagram</span>
+              <em>@geacofi</em>
+            </div>
+          </div>
+        </section>
+
+<!-- 5 · TU NOMBRE EN LA TAZA (input + flip) -->
+        <section id="name" class="section">
+          <div class="inner container">
+            <div class="name-header">
+              <p class="sub1" data-reveal>Pedidos con nombre propio</p>
+              <h2 data-reveal>Escribilo.<br />Lo servimos.</h2>
+              <p class="body2" data-reveal>Escribí tu nombre. Voltea la taza. Se ve distinto,<br />pero sigue siendo tuyo. Probalo.</p>
+            </div>
+            <div class="name-field">
+              <div class="name-line"></div><div class="name-line"></div><div class="name-line"></div><div class="name-line"></div>
+              <input id="name-input" type="text" value="GEACOFI" maxlength="10" autocomplete="off" spellcheck="false" aria-label="Tu nombre" />
+            </div>
+            <button id="name-btn" class="btn is-active is-flipper" type="button"><span class="is-flipper-target">Voltear taza</span></button>
+          </div>
+        </section>
+
+<!-- 6 · ZOOM AL GRANO (lupa arrastrable) -->
+        <section id="grip" class="section">
+          <div class="inner container">
+            <div class="grip-header">
+              <p class="sub1" data-reveal>Hasta el último detalle</p>
+              <h2 data-reveal>Un grano,<br />bien de cerca</h2>
+              <p class="body2" data-reveal>Tueste parejo, aroma intenso y mucha textura. <br />Arrastrá la lupa y mirá lo que hay<br />detrás de cada taza.</p>
+            </div>
+            <div id="zoom" class="zoom sub2" data-src="/studio/beans.jpg">
+              <div id="zoom-box" class="zoom-box">
+                <div class="zoom-box-img"></div>
+                <div class="zoom-box-info"><span class="zoom-box-bg"></span><span>Intensidad (est):</span><b id="zoom-coeff">0.80</b></div>
+              </div>
+            </div>
+            <div class="grip-instruction sub2"><span class="ring"></span><span>Arrastrar</span></div>
+          </div>
+        </section>
+
+<!-- 7 · HECHO CON CALMA (números) -->
+        <section id="care" class="section">
+          <div class="inner container">
+            <div class="care-hero">
+              <p class="sub2" data-reveal>Una esquina, una carta</p>
+              <h4 data-reveal>Pensado con calma</h4>
+              <h2 data-reveal>GeaCofi</h2>
+              <p class="body2" data-reveal>Poca carta, bien hecha. Cada cosa<br />está pensada para acompañar un café,<br />no para competir con él.</p>
+            </div>
+            <div class="care-items">
+              <article class="care-item">
+                <figure class="care-foto care-foto--duo"><img src="/img/cafe-filtrado.webp" alt="" loading="lazy" decoding="async" /><img src="/img/medialuna.webp" alt="" loading="lazy" decoding="async" /></figure>
+                <p class="sub2 care-n">01</p>
+                <h4>Poca carta,<br />bien hecha</h4>
+                <p class="body2">Tres cafés y tres bocados de panadería que se llevan bien entre sí. Elegir es lo más difícil.</p>
+                <a class="care-link sub2" href="/carta.html">Ver la carta →</a>
+              </article>
+              <article class="care-item">
+                <figure class="care-foto"><img src="/studio/counter.webp" alt="La barra de GeaCofi" loading="lazy" decoding="async" /></figure>
+                <p class="sub2 care-n">02</p>
+                <h4>Una esquina<br />para visitar</h4>
+                <p class="body2">9 de Julio 996. Pasá, sentate y pedí con calma, o llevate el café para seguir caminando.</p>
+                <a class="care-link sub2" href="https://www.google.com/maps/search/?api=1&amp;query=GeaCofi%209%20de%20Julio%20996" target="_blank" rel="noopener">Cómo llegar ↗</a>
+              </article>
+              <article class="care-item">
+                <figure class="care-foto"><img src="/studio/pour.webp" alt="Un filtrado sirviéndose" loading="lazy" decoding="async" /></figure>
+                <p class="sub2 care-n">03</p>
+                <h4>Sin apuro,<br />sin culpa</h4>
+                <p class="body2">Acá el café se toma tranquilo. Podés decir &ldquo;por favor&rdquo; y &ldquo;gracias&rdquo; cuantas veces quieras.</p>
+                <a class="care-link sub2" href="/carta.html">Pedir ahora →</a>
+              </article>
+            </div>
+          </div>
+        </section>
+
+<!-- 11 · FOOTER -->
+        <section id="footer" class="section"></section>
+      </main>
+
+      <div id="scroll-hint" class="sub2" aria-hidden="true">
+        <div class="scroll-hint-icon"><svg viewBox="0 0 13 8"><path fill="currentColor" d="M0 1.873 1.654 0l4.82 4.258L11.293 0l1.654 1.873-6.473 5.72z" /></svg></div>
+        <span>Scroll para seguir</span>
+      </div>
+      <div id="scroll-indicator" aria-hidden="true"><div class="bar"><span class="dot"></span><span class="label sub2">Menú</span></div></div>
+      <div id="cursor" aria-hidden="true"></div>
+
+      <div id="preloader" aria-hidden="true"><div class="pre-word">GEACOFI</div><div class="pre-count">0</div></div>
+    </div>
+
+    <script type="module" src="/main.js"></script>
+  </body>
+</html>

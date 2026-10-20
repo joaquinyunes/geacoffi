@@ -1,0 +1,352 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GeaCofi · Café de especialidad</title>
+<meta name="description" content="GeaCofi, café de especialidad en 9 de Julio 996. Mirá la carta y escribinos por WhatsApp.">
+<style>
+:root{
+  --cream:#f1e7d8; --olive:#46531c; --terra:#a8432f; --ink:#151410; --ink2:#201d17;
+  --head:"Helvetica Neue",Helvetica,Arial,sans-serif; --serif:Georgia,"Times New Roman",serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--ink);color:var(--cream);font-family:var(--head);line-height:1.5;overflow-x:hidden}
+a{color:inherit;text-decoration:none}
+.wrap{width:min(1200px,100% - 32px);margin-inline:auto}
+em{font-family:var(--serif);font-style:italic;font-weight:400;text-transform:none;letter-spacing:0}
+
+/* nav */
+nav{position:fixed;inset:0 0 auto;z-index:10;padding:14px 0;transition:background .3s}
+nav.solid{background:rgba(21,20,16,.88);backdrop-filter:blur(8px)}
+nav .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:15px}
+.brand svg{width:38px;height:38px}
+nav ul{display:flex;gap:28px;list-style:none;font-size:12px;letter-spacing:.14em;text-transform:uppercase}
+nav ul a:hover{color:var(--terra)}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:12px 22px;border-radius:999px;background:var(--cream);color:var(--ink);font-size:12px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;transition:transform .2s,background .2s}
+.btn:hover{transform:translateY(-2px);background:#fff}
+.btn.terra{background:var(--terra);color:var(--cream)}
+.btn.terra:hover{background:#c0513a}
+.btn.ghost{background:none;border:1px solid rgba(241,231,216,.4);color:var(--cream)}
+@media(max-width:760px){nav ul{display:none}}
+
+/* hero */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;padding:110px 0 60px;
+  background:radial-gradient(60% 60% at 72% 55%,#3b3a17 0%,#1d1c13 55%,var(--ink) 100%)}
+.hero .wrap{display:grid;grid-template-columns:1.1fr 1fr;gap:24px;align-items:center}
+.eyebrow{display:flex;align-items:center;gap:10px;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:#cfc5b2}
+.eyebrow i{width:8px;height:8px;border-radius:50%;background:var(--terra)}
+h1{font-size:clamp(48px,9vw,128px);line-height:.92;letter-spacing:-.04em;font-weight:800;text-transform:uppercase;margin:22px 0}
+h1 em{display:block;font-size:.78em;color:var(--terra);margin-top:.05em}
+.hero p.lead{max-width:420px;color:#d6cdbb;font-size:15px}
+.hero .cta{display:flex;flex-wrap:wrap;gap:12px;margin-top:28px}
+.hero .info{display:flex;flex-wrap:wrap;gap:36px;margin-top:56px;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#a79f8e}
+.hero .info b{display:block;color:var(--cream);font-weight:600;margin-bottom:2px}
+.stage{position:relative;aspect-ratio:1/1.05;max-width:560px;margin-inline:auto;width:100%;perspective:900px}
+.stage .layer{position:absolute;transition:transform .15s ease-out;will-change:transform}
+.stage .bag{right:2%;bottom:8%;width:56%}
+.stage .cup{left:2%;bottom:2%;width:40%}
+.stage .tag{position:absolute;top:2%;right:0;background:#0d0c09;border:1px solid #3a352a;padding:10px 16px;font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.stage .tag b{display:block;font-size:15px;letter-spacing:.06em}
+.stage .tag span{color:var(--terra)}
+@media(max-width:860px){.hero .wrap{grid-template-columns:1fr}.stage{max-width:380px}}
+
+/* carta */
+.light{background:var(--cream);color:var(--ink)}
+section{padding:110px 0}
+.kicker{font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--terra);font-weight:700}
+h2{font-size:clamp(34px,5.5vw,76px);line-height:.98;letter-spacing:-.035em;text-transform:uppercase;font-weight:800;margin:14px 0 48px}
+h2 em{color:var(--olive)}
+.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.card{border:1px solid rgba(21,20,16,.18);background:#f7efe2;padding:18px;display:flex;flex-direction:column;min-height:340px;transition:transform .3s,box-shadow .3s}
+.card:hover{transform:translateY(-6px);box-shadow:0 18px 30px -18px rgba(21,20,16,.5)}
+.card .top,.card .bot{display:flex;justify-content:space-between;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:#6d6657}
+.card svg{width:62%;margin:auto;transition:transform .5s}
+.card:hover svg{transform:rotate(-6deg) scale(1.06)}
+.card h3{font-size:18px;text-transform:uppercase;letter-spacing:-.01em;margin-top:6px}
+.card p{font-size:13px;color:#4a4538;margin:4px 0 12px}
+.card .price{color:var(--terra);font-weight:700}
+@media(max-width:980px){.cards{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:520px){.cards{grid-template-columns:1fr}}
+
+/* reloj */
+.clockSec{background:var(--cream);color:var(--ink);padding-top:0}
+.clockSec .wrap{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:center}
+.clockBox{position:relative;width:min(460px,100%);aspect-ratio:1;margin-inline:auto}
+.clockBox>svg.face{width:100%;height:100%}
+.clockBox .glass{position:absolute;left:50%;bottom:-6%;width:34%;transform:translateX(-50%)}
+.hrs{margin-top:22px;border-top:1px solid rgba(21,20,16,.2);padding-top:16px;font-size:13px;letter-spacing:.1em;text-transform:uppercase}
+@media(max-width:860px){.clockSec .wrap{grid-template-columns:1fr}}
+
+/* lento */
+.slow{position:relative;background:var(--ink);overflow:hidden;min-height:100svh;display:flex;align-items:center;text-align:center}
+.slow h2{font-size:clamp(40px,8vw,120px);margin:0 auto}
+.slow h2 .w{display:inline-block;opacity:0;transform:translateY(40px);transition:opacity .7s,transform .7s}
+.slow.in h2 .w{opacity:1;transform:none}
+.slow p{max-width:460px;margin:26px auto 0;color:#cfc5b2}
+.bean{position:absolute;width:34px;opacity:.85;will-change:transform}
+
+/* ubicación */
+.where{background:var(--olive);color:var(--cream)}
+.where .wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:40px;align-items:end}
+.where h2 em{color:var(--cream)}
+.where .box{border:1px solid rgba(241,231,216,.35);padding:28px}
+.where .box p{margin-bottom:6px}
+.where .box .cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:20px}
+@media(max-width:860px){.where .wrap{grid-template-columns:1fr}}
+
+footer{background:var(--ink);padding:70px 0 24px;overflow:hidden}
+footer .big{font-size:clamp(70px,22vw,330px);font-weight:900;letter-spacing:-.06em;line-height:.8;text-transform:lowercase;color:transparent;-webkit-text-stroke:1.5px rgba(241,231,216,.28);white-space:nowrap;text-align:center}
+footer .row{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;margin-top:30px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#8c8575}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(34px);transition:opacity .8s,transform .8s}
+.rv.in{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  .rv,.slow h2 .w{opacity:1;transform:none;transition:none}
+  .stage .layer{transition:none}
+}
+</style>
+</head>
+<body>
+
+<!-- Símbolos reutilizables -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="frog" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="48" fill="#f1e7d8"/>
+    <g fill="none" stroke="#46531c" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M24 44c-5-9 2-19 11-14 5-3 25-3 30 0 9-5 16 5 11 14"/>
+      <path d="M26 46c0 12 10 20 24 20s24-8 24-20"/>
+      <path d="M33 38h10M57 38h10"/>
+      <path d="M40 55c6 3 14 3 20 0"/>
+      <path d="M36 72c-4 8 4 14 14 14s18-6 14-14"/>
+      <path d="M40 68h20v6c0 4-4 7-10 7s-10-3-10-7z" fill="#f1e7d8"/>
+      <path d="M46 62c-2-3 2-4 0-7M54 62c-2-3 2-4 0-7" stroke-width="2.2"/>
+    </g>
+  </symbol>
+</svg>
+
+<nav id="nav">
+  <div class="wrap">
+    <a class="brand" href="#top"><svg><use href="#frog"/></svg>GeaCofi</a>
+    <ul>
+      <li><a href="#carta">Carta</a></li>
+      <li><a href="#hora">Hora</a></li>
+      <li><a href="#donde">Dónde</a></li>
+    </ul>
+    <a class="btn terra js-wa" href="#" target="_blank" rel="noopener">WhatsApp</a>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow"><i></i>Café de especialidad · 9 de Julio 996</div>
+      <h1>Café para<br>tu <em>momento</em></h1>
+      <p class="lead">Granos de especialidad, métodos filtrados y panadería del día, preparados despacio. Mirá la carta y escribinos por WhatsApp.</p>
+      <div class="cta">
+        <a class="btn" href="#carta">Ver la carta ↓</a>
+        <a class="btn ghost js-wa" href="#" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+      </div>
+      <div class="info">
+        <div><b>Dirección</b>9 de Julio 996</div>
+        <div><b>Horarios</b><span id="hoursTxt"></span></div>
+        <div><b>Instagram</b>@geacofi</div>
+      </div>
+    </div>
+
+    <div class="stage" id="stage" aria-hidden="true">
+      <div class="tag"><span>●</span> Hoy en filtro<b>Chemex · V60</b></div>
+      <!-- bolsa -->
+      <div class="layer bag" data-depth="26">
+        <svg viewBox="0 0 240 340">
+          <defs><linearGradient id="bg1" x1="0" x2="1"><stop offset="0" stop-color="#e4d8c4"/><stop offset=".5" stop-color="#f6eddd"/><stop offset="1" stop-color="#d9cbb3"/></linearGradient></defs>
+          <ellipse cx="120" cy="326" rx="104" ry="12" fill="#000" opacity=".45"/>
+          <path d="M26 40 L214 40 L226 318 Q120 330 14 318 Z" fill="url(#bg1)"/>
+          <path d="M26 40 L214 40 L216 62 L24 62 Z" fill="#cdbfa6"/>
+          <path d="M30 52h180" stroke="#a89a82" stroke-dasharray="3 5"/>
+          <g transform="translate(78 94)"><use href="#frog" width="84" height="84"/></g>
+          <text x="120" y="212" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-weight="800" font-size="30" fill="#151410" letter-spacing="-1">geacofi</text>
+          <text x="120" y="238" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="28" fill="#a8432f">filtrado</text>
+          <text x="120" y="290" text-anchor="middle" font-family="Helvetica,Arial,sans-serif" font-size="9" letter-spacing="3" fill="#46531c">CAFÉ DE ESPECIALIDAD</text>
+        </svg>
+      </div>
+      <!-- taza -->
+      <div class="layer cup" data-depth="44">
+        <svg viewBox="0 0 150 230">
+          <defs><linearGradient id="cg1" x1="0" x2="1"><stop offset="0" stop-color="#d9cdb8"/><stop offset=".45" stop-color="#f7efe1"/><stop offset="1" stop-color="#cdbfa6"/></linearGradient></defs>
+          <ellipse cx="75" cy="222" rx="58" ry="8" fill="#000" opacity=".45"/>
+          <path d="M14 56 L136 56 L120 214 Q75 224 30 214 Z" fill="#efe5d2"/>
+          <path d="M14 56 L136 56 L132 96 L18 96 Z" fill="#fff" opacity=".18"/>
+          <path d="M30 118 L120 118 L116 172 L34 172 Z" fill="#a8432f"/>
+          <g transform="translate(53 124)"><use href="#frog" width="44" height="44"/></g>
+          <rect x="8" y="30" width="134" height="30" rx="9" fill="#2a261e"/>
+          <rect x="22" y="14" width="106" height="20" rx="8" fill="#1d1a14"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="light" id="carta">
+  <div class="wrap">
+    <div class="kicker rv">La carta</div>
+    <h2 class="rv">Lo que sale de la <em>barra</em></h2>
+    <div class="cards" id="cards"></div>
+  </div>
+</section>
+
+<section class="clockSec" id="hora">
+  <div class="wrap">
+    <div class="clockBox rv">
+      <svg class="face" viewBox="0 0 400 400" id="clock">
+        <circle cx="200" cy="200" r="190" fill="#f7efe2" stroke="#151410" stroke-width="2"/>
+        <g id="ticks"></g>
+        <line id="hHand" x1="200" y1="200" x2="200" y2="110" stroke="#151410" stroke-width="7" stroke-linecap="round"/>
+        <line id="mHand" x1="200" y1="200" x2="200" y2="70" stroke="#151410" stroke-width="4" stroke-linecap="round"/>
+        <line id="sHand" x1="200" y1="215" x2="200" y2="62" stroke="#a8432f" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="200" cy="200" r="7" fill="#a8432f"/>
+      </svg>
+      <svg class="glass" viewBox="0 0 120 200" aria-hidden="true">
+        <ellipse cx="60" cy="192" rx="42" ry="6" fill="#000" opacity=".25"/>
+        <path d="M16 40 L104 40 L94 186 Q60 194 26 186 Z" fill="#3b2314" opacity=".95"/>
+        <path d="M16 40 L104 40 L101 80 L19 80 Z" fill="#6b4126"/>
+        <rect x="28" y="52" width="30" height="30" rx="6" fill="#fff" opacity=".35" transform="rotate(-10 43 67)"/>
+        <rect x="62" y="64" width="28" height="28" rx="6" fill="#fff" opacity=".3" transform="rotate(12 76 78)"/>
+        <rect x="70" y="-6" width="7" height="110" rx="3" fill="#151410" transform="rotate(10 73 50)"/>
+        <path d="M16 40 L104 40" stroke="#151410" stroke-width="2"/>
+      </svg>
+    </div>
+    <div class="rv">
+      <div class="kicker">Hora de GeaCofi</div>
+      <h2>Sin <em>apuro</em>,<br>con buen café</h2>
+      <p>Pasá por 9 de Julio 996 y pedí lo que quieras: un filtrado para charlar, un café frío para el calor o algo dulce para acompañar.</p>
+      <p class="hrs" id="hoursLine"></p>
+    </div>
+  </div>
+</section>
+
+<section class="slow" id="slow">
+  <div class="wrap">
+    <div class="kicker rv">Slow coffee</div>
+    <h2 id="slowH"></h2>
+    <p class="rv">Granos de especialidad, agua a punto y manos que saben. Lo de siempre, o algo nuevo: te esperamos.</p>
+  </div>
+</section>
+
+<section class="where" id="donde">
+  <div class="wrap">
+    <h2 class="rv">Te <em>esperamos</em></h2>
+    <div class="box rv">
+      <p class="kicker" style="color:var(--cream)">Dónde</p>
+      <p style="font-size:22px;font-weight:700">9 de Julio 996</p>
+      <p>Café de especialidad</p>
+      <div class="cta">
+        <a class="btn js-wa" href="#" target="_blank" rel="noopener">Escribir por WhatsApp</a>
+        <a class="btn ghost" href="https://www.instagram.com/geacofi/" target="_blank" rel="noopener">@geacofi</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="big" aria-hidden="true">geacofi</div>
+    <div class="row"><span>© GeaCofi · Café de especialidad</span><span>9 de Julio 996</span></div>
+  </div>
+</footer>
+
+<script>
+// Todo lo editable vive acá: contacto, horarios y carta. Dejá "price" vacío para ocultarlo.
+const DATA = {
+  whatsapp: "https://wa.me/message/KFA3BBGBV2PLA1",
+  horarios: "",                      // ej: "Lun a Sáb · 8 a 20 h". Vacío = consultar por WhatsApp.
+  carta: [
+    {id:"filtrado", nombre:"Café filtrado",  desc:"Chemex o V60, granos de especialidad.", price:""},
+    {id:"taza",     nombre:"Café de siempre", desc:"El de todos los días, bien hecho.",     price:""},
+    {id:"frio",     nombre:"Café frío",       desc:"Con hielo y mucha cabeza fría.",        price:""},
+    {id:"rol",      nombre:"Rol de canela",   desc:"Tibio, con glaseado.",                  price:""}
+  ]
+};
+
+const ICONS = {
+  filtrado:`<svg viewBox="0 0 120 140"><g fill="none" stroke="#46531c" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"><path d="M22 18h76L74 52H46z" fill="#f1e7d8"/><path d="M46 52h28v10H46z"/><path d="M30 62h60l-6 62q-24 8-48 0z" fill="#e3d4bb"/><path d="M36 92h48"/><path d="M60 62v-8"/></g><path d="M36 96h48l-3 24q-21 6-42 0z" fill="#3b2314"/></svg>`,
+  taza:`<svg viewBox="0 0 120 140"><g stroke="#151410" stroke-width="3" stroke-linejoin="round"><path d="M16 50h76v34a34 34 0 0 1-34 34H50a34 34 0 0 1-34-34z" fill="#f7efe2"/><path d="M92 62h8a14 14 0 0 1 0 28h-8" fill="none"/><ellipse cx="54" cy="50" rx="38" ry="8" fill="#3b2314"/></g><path d="M40 36c-4-6 4-8 0-14M62 36c-4-6 4-8 0-14" fill="none" stroke="#46531c" stroke-width="3" stroke-linecap="round"/></svg>`,
+  frio:`<svg viewBox="0 0 120 140"><g stroke="#151410" stroke-width="3" stroke-linejoin="round"><path d="M28 36h64l-8 90H36z" fill="#f7efe2"/><path d="M31 56h58l-5 70H36z" fill="#3b2314"/><rect x="40" y="62" width="22" height="22" rx="4" fill="#fff" opacity=".5" transform="rotate(-10 51 73)"/><rect x="62" y="74" width="20" height="20" rx="4" fill="#fff" opacity=".45" transform="rotate(12 72 84)"/><path d="M72 4l-10 62" fill="none" stroke-width="5" stroke-linecap="round"/></g></svg>`,
+  rol:`<svg viewBox="0 0 120 140"><g stroke="#151410" stroke-width="3"><ellipse cx="60" cy="100" rx="50" ry="14" fill="#2a261e"/><circle cx="60" cy="78" r="38" fill="#c98a4b"/></g><g fill="none" stroke="#7a4a21" stroke-width="5" stroke-linecap="round"><path d="M60 78m-8 0a8 8 0 1 1 8 8"/><path d="M60 78m-18 0a18 18 0 0 1 18-18"/><path d="M60 78m-28 4a28 28 0 0 0 40 22"/></g><path d="M34 60q10-14 26-12t24 12q-8 6-12 2-4 8-14 2-6 6-14 2z" fill="#f7efe2" stroke="#151410" stroke-width="2"/></svg>`
+};
+
+// WhatsApp, horarios
+document.querySelectorAll(".js-wa").forEach(a => a.href = DATA.whatsapp);
+const hrs = DATA.horarios || "Consultá por WhatsApp";
+document.getElementById("hoursTxt").textContent = hrs;
+document.getElementById("hoursLine").textContent = "Horarios: " + hrs;
+
+// Carta
+document.getElementById("cards").innerHTML = DATA.carta.map((c,i) => `
+  <article class="card rv" style="transition-delay:${i*90}ms">
+    <div class="top"><span>${String(i+1).padStart(2,"0")}</span><span>GeaCofi</span></div>
+    ${ICONS[c.id] || ""}
+    <h3>${c.nombre}</h3><p>${c.desc}</p>
+    <div class="bot"><span>Pedir por WhatsApp</span><span class="price">${c.price}</span></div>
+  </article>`).join("");
+
+const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// Reveal al hacer scroll
+const io = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } }), {threshold:.2});
+document.querySelectorAll(".rv,.slow").forEach(el => io.observe(el));
+
+// Frase palabra por palabra
+document.getElementById("slowH").innerHTML = "Tu café no debería <em>apurarte</em>.".split(" ")
+  .map((w,i) => `<span class="w" style="transition-delay:${i*110}ms">${w}</span>`).join(" ");
+
+// Nav sólido
+const nav = document.getElementById("nav");
+addEventListener("scroll", () => nav.classList.toggle("solid", scrollY > 40), {passive:true});
+
+// Reloj con hora real
+const ticks = document.getElementById("ticks");
+for(let i=0;i<60;i++){
+  const a = i*6*Math.PI/180, big = i%5===0, r1 = big?160:172, r2 = 180;
+  ticks.insertAdjacentHTML("beforeend", `<line x1="${200+Math.sin(a)*r1}" y1="${200-Math.cos(a)*r1}" x2="${200+Math.sin(a)*r2}" y2="${200-Math.cos(a)*r2}" stroke="#151410" stroke-width="${big?3:1}"/>`);
+  if(big){ const n = i/5||12, rn = 138;
+    ticks.insertAdjacentHTML("beforeend", `<text x="${200+Math.sin(a)*rn}" y="${200-Math.cos(a)*rn+7}" text-anchor="middle" font-family="Georgia,serif" font-size="22" fill="#151410">${n}</text>`); }
+}
+const hH = document.getElementById("hHand"), mH = document.getElementById("mHand"), sH = document.getElementById("sHand");
+function tick(){
+  const d = new Date(), s = d.getSeconds(), m = d.getMinutes()+s/60, h = (d.getHours()%12)+m/60;
+  hH.setAttribute("transform", `rotate(${h*30} 200 200)`);
+  mH.setAttribute("transform", `rotate(${m*6} 200 200)`);
+  sH.setAttribute("transform", `rotate(${s*6} 200 200)`);
+}
+tick(); setInterval(tick, 1000);
+
+// Granos flotando con parallax
+const slow = document.getElementById("slow"), beans = [];
+const BEAN = `<svg viewBox="0 0 40 56"><ellipse cx="20" cy="28" rx="17" ry="25" fill="#4a2a17" transform="rotate(20 20 28)"/><path d="M14 6C24 20 14 36 26 50" fill="none" stroke="#1d0f07" stroke-width="3" stroke-linecap="round"/></svg>`;
+for(let i=0;i<16;i++){
+  const b = document.createElement("div"); b.className = "bean"; b.innerHTML = BEAN;
+  b.style.left = (Math.random()*94)+"%"; b.style.top = (Math.random()*90)+"%";
+  const sc = .6+Math.random()*1.1; b.dataset.sp = (Math.random()*.5+.1)*(Math.random()<.5?-1:1); b.dataset.sc = sc; b.dataset.rt = Math.random()*360;
+  b.style.filter = `blur(${sc>1.4?2:0}px)`; slow.appendChild(b); beans.push(b);
+}
+function parallax(){
+  if(reduce) return;
+  const r = slow.getBoundingClientRect(), p = r.top;
+  beans.forEach(b => b.style.transform = `translateY(${p*b.dataset.sp}px) rotate(${+b.dataset.rt + p*.1}deg) scale(${b.dataset.sc})`);
+}
+addEventListener("scroll", parallax, {passive:true}); parallax();
+
+// Inclinación del hero con el mouse
+const stage = document.getElementById("stage");
+if(!reduce) addEventListener("mousemove", e => {
+  const x = e.clientX/innerWidth-.5, y = e.clientY/innerHeight-.5;
+  stage.querySelectorAll(".layer").forEach(l => l.style.transform = `translate(${x*+l.dataset.depth}px,${y*+l.dataset.depth*.6}px) rotate(${x*3}deg)`);
+});
+</script>
+</body>
+</html>

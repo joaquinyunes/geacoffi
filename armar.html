@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es" class="no-js light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#e9e6e1" />
+    <title>Armá tu pedido · GeaCofi</title>
+    <meta name="description" content="Armá tu pedido en GeaCofi: elegí la base, sumá panadería y pedí por WhatsApp." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono&family=Fraunces:ital,wght@1,400&family=Inter+Tight:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body id="top" data-page="armar" class="on-light">
+
+    <div id="ui">
+      <header id="header">
+        <a id="header-logo" href="/" aria-label="GeaCofi, inicio">GEACOFI</a>
+        <nav id="header-nav" aria-label="Principal">
+          <ul>
+            <li class="is-flipper" data-id="inicio"><a class="is-flipper-target" href="/">Inicio</a></li>
+            <li class="is-flipper" data-id="detalles"><a class="is-flipper-target" href="/detalles.html">Detalles</a></li>
+            <li class="is-flipper" data-id="carta"><a class="is-flipper-target" href="/carta.html">Carta</a></li>
+            <li class="is-flipper" data-id="armar"><a class="is-flipper-target" href="/armar.html" aria-current="page">Pedido</a></li>
+            <li class="is-flipper" data-id="eventos"><a class="is-flipper-target" href="/#eventos">Eventos</a></li>
+            <li class="is-flipper" data-id="footer"><a class="is-flipper-target" href="#footer">Contacto</a></li>
+          </ul>
+          <div id="header-line" class="dashline"></div>
+        </nav>
+      </header>
+
+      <main id="content">
+
+        <section id="armar" class="section">
+          <div class="inner container">
+            <div class="cr-head">
+              <p class="cr-pill sub2" data-reveal>Armá tu pedido</p>
+              <h1 data-reveal>Tu pedido,<br />en tres pasos.</h1>
+              <p class="body2" data-reveal>Elegí la base, sumá algo de panadería y poné tu nombre. Después lo pedís por WhatsApp.</p>
+            </div>
+            <div class="cr-grid">
+              <div class="cr-col" id="cr-steps">
+                <article class="cr-card">
+                  <span class="cr-step sub2">01 · Elegí la base</span>
+                  <div class="cr-chips" data-group="base">
+                    <button type="button" class="cr-chip is-on" data-v="Filtrado" data-img="cafe-filtrado">Filtrado</button>
+                    <button type="button" class="cr-chip" data-v="De siempre" data-img="cafe-de-siempre">De siempre</button>
+                    <button type="button" class="cr-chip" data-v="Frío" data-img="cafe-frio">Frío</button>
+                  </div>
+                </article>
+                <article class="cr-card">
+                  <span class="cr-step sub2">02 · Sumá panadería</span>
+                  <div class="cr-chips" data-group="pan">
+                    <button type="button" class="cr-chip is-on" data-v="Medialuna" data-img="medialuna">Medialuna</button>
+                    <button type="button" class="cr-chip" data-v="Rol de canela" data-img="rol-de-canela">Rol de canela</button>
+                    <button type="button" class="cr-chip" data-v="Tostado" data-img="tostado">Tostado</button>
+                    <button type="button" class="cr-chip" data-v="" data-img="">Sin panadería</button>
+                  </div>
+                </article>
+                <article class="cr-card">
+                  <span class="cr-step sub2">03 · Tu nombre</span>
+                  <input id="cr-name" class="cr-input" type="text" maxlength="12" placeholder="Escribilo" autocomplete="off" spellcheck="false" aria-label="Nombre para el pedido" />
+                </article>
+              </div>
+              <div class="cr-col">
+                <article class="cr-card cr-stage" aria-live="polite">
+                  <span class="cr-step sub2">Vista previa</span>
+                  <div class="cr-slots">
+                    <figure class="cr-slot" id="slot-base"><img src="/img/cafe-filtrado.webp" alt="Café filtrado" /></figure>
+                    <figure class="cr-slot" id="slot-pan"><img src="/img/medialuna.webp" alt="Medialuna" /></figure>
+                  </div>
+                  <span id="cr-tag" class="cr-tag" hidden></span>
+                </article>
+                <article class="cr-card cr-summary">
+                  <span class="cr-step sub2">Tu pedido</span>
+                  <p id="cr-out" class="quote">Filtrado + Medialuna</p>
+                  <button id="cr-pedir" class="btn" type="button">Pedir esto por WhatsApp</button>
+                </article>
+              </div>
+            </div>
+          </div>
+        </section>
+
+<!-- 11 · FOOTER -->
+        <section id="footer" class="section"></section>
+      </main>
+
+      <div id="scroll-hint" class="sub2" aria-hidden="true">
+        <div class="scroll-hint-icon"><svg viewBox="0 0 13 8"><path fill="currentColor" d="M0 1.873 1.654 0l4.82 4.258L11.293 0l1.654 1.873-6.473 5.72z" /></svg></div>
+        <span>Scroll para seguir</span>
+      </div>
+      <div id="scroll-indicator" aria-hidden="true"><div class="bar"><span class="dot"></span><span class="label sub2">Menú</span></div></div>
+      <div id="cursor" aria-hidden="true"></div>
+    </div>
+
+    <script type="module" src="/main.js"></script>
+    <script type="module" src="/armar.js"></script>
+    <script type="module" src="/pedido.js"></script>
+  </body>
+</html>
