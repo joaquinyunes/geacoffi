@@ -566,7 +566,7 @@ function updatePinned() {
 
 /* ==========================================================================
    SECUENCIA DE FOTOGRAMAS · scroll → fotograma (latte → vaso GEACOFFE)
-   Canvas 2D dentro de #ai (sticky). Los 150 .webp se precargan de grueso a fino
+   Canvas 2D dentro de #ai (sticky). Los 150 .webp se piden al acercarse la sección, de grueso a fino
    (0, último, cada 30, 10, 3, 1): siempre hay un fotograma cercano para dibujar.
    ========================================================================== */
 const SEQ = { n: 150, frames: [], cur: 0, img: null }
@@ -579,7 +579,9 @@ function loadSequence() {
   if (!seqCv) return
   const order = [0, SEQ.n - 1]
   const seen = new Set(order)
-  for (const step of [30, 10, 3, 1]) for (let i = 0; i < SEQ.n; i += step) if (!seen.has(i)) { seen.add(i); order.push(i) }
+  // celular o ahorro de datos: solo 1 de cada 3 (o 10) fotogramas; seqNearest dibuja el más cercano
+  const min = navigator.connection?.saveData ? 10 : isMobile() ? 3 : 1
+  for (const step of [30, 10, 3, 1]) if (step >= min) for (let i = 0; i < SEQ.n; i += step) if (!seen.has(i)) { seen.add(i); order.push(i) }
   let next = 0
   const worker = async () => {
     while (next < order.length) {
@@ -872,7 +874,8 @@ async function boot() {
   document.dispatchEvent(new Event('gc:ready'))
   // llegada con ancla desde otra página (ej: /#eventos): el navegador saltó antes de medir las secciones fijadas
   try { const t = location.hash && $(location.hash); if (t) scrollTo({ top: t.getBoundingClientRect().top + scrollY, behavior: 'instant' }) } catch { /* ancla inválida */ }
-  loadSequence() // después del preloader: no compite con las texturas del hero
+  // los fotogramas se piden recién cuando la sección #ai está a una pantalla de distancia
+  if (seqSec) new IntersectionObserver((e, ob) => { if (e[0].isIntersecting) { ob.disconnect(); loadSequence() } }, { rootMargin: '100% 0px' }).observe(seqSec)
   if ($('#preloader')) {
     const tl = gsap.timeline()
     tl.to('#preloader', { yPercent: -100, duration: 1.1, ease: 'expo.inOut' })
