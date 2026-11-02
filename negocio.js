@@ -64,12 +64,10 @@ export const EVENTOS = []
 export const VISITAS = []
 
 /*
-  Contenido editable desde /admin.html. Se trae de Supabase antes de que arranque la página y pisa los valores de arriba;
-  si falla (sin red, proyecto pausado) queda la última copia guardada en el navegador o, si no hay, lo de este archivo.
+  Contenido editable desde /admin.html. Se trae de MongoDB (/api/contenido) antes de que arranque la página y pisa los valores de arriba;
+  si falla (sin red o base caída) queda la última copia guardada en el navegador o, si no hay, lo de este archivo.
   shortcut: el panel edita datos, precios, nombres y fotos de los productos de arriba, eventos y visitas; productos nuevos y los textos de la carta siguen en el código.
 */
-export const SUPABASE = { url: 'https://jgzdhmpfokmyoiktboux.supabase.co', key: 'sb_publishable_k1WCrn7mJQm4vDOIhUfJnA_xyK0KcpX' }
-
 function aplicar(c) {
   if (c.negocio) {
     const { envio, pedidos, ...resto } = c.negocio
@@ -89,9 +87,9 @@ function aplicar(c) {
 
 async function traer() {
   try {
-    const r = await fetch(`${SUPABASE.url}/rest/v1/geacofi_contenido?select=clave,valor`, { headers: { apikey: SUPABASE.key }, signal: AbortSignal.timeout(2000) })
+    const r = await fetch('/api/contenido', { signal: AbortSignal.timeout(2000) })
     if (!r.ok) throw new Error(r.status)
-    const c = Object.fromEntries((await r.json()).map((f) => [f.clave, f.valor]))
+    const c = await r.json()
     try { localStorage.setItem('gc:contenido', JSON.stringify(c)) } catch { /* sin storage: no pasa nada */ }
     return c
   } catch {

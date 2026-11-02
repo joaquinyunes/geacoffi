@@ -1,12 +1,19 @@
 /* ==========================================================================
    GeaCofi · admin.js
    Panel para cambiar datos, precios, fotos, eventos y visitas sin tocar código.
-   Entra con un usuario de Supabase que esté en geacofi_admins; guarda en geacofi_contenido.
+   Entra con la clave del panel (ADMIN_PASSWORD en Vercel); guarda en MongoDB vía /api/contenido y /api/foto.
    ========================================================================== */
-import { createClient } from '@supabase/supabase-js'
-import { NEGOCIO, PRODUCTOS, EVENTOS, VISITAS, SUPABASE } from './negocio.js'
+import { NEGOCIO, PRODUCTOS, EVENTOS, VISITAS } from './negocio.js'
 
-const db = createClient(SUPABASE.url, SUPABASE.key)
+// La clave vive solo en esta pestaña (sessionStorage) y viaja en un encabezado; el servidor la compara con ADMIN_PASSWORD.
+const CLAVE = 'gc:clave'
+const clave = () => { try { return sessionStorage.getItem(CLAVE) || '' } catch { return '' } }
+async function api(ruta, { metodo = 'GET', cuerpo, tipo } = {}) {
+  const r = await fetch(`/api/${ruta}`, { method: metodo, headers: { ...(tipo ? { 'content-type': tipo } : {}), 'x-admin-clave': clave() }, body: cuerpo })
+  const j = r.status === 204 ? {} : await r.json().catch(() => ({}))
+  if (!r.ok) throw new Error(j.error || `Error ${r.status}`)
+  return j
+}
 const app = document.querySelector('#app')
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c])
 
@@ -20,25 +27,22 @@ function login(aviso = '') {
   app.innerHTML = `
     <h1>GeaCofi · Panel</h1>
     <form id="f-login">
-      <label for="email">Email</label><input id="email" type="email" autocomplete="username" required />
-      <label for="clave">Contraseña</label><input id="clave" type="password" autocomplete="current-password" required />
+      <label for="clave">Contraseña del panel</label><input id="clave" type="password" autocomplete="current-password" required />
       <p id="msg" class="${aviso ? 'mal' : ''}">${esc(aviso)}</p>
       <button class="pri">Entrar</button>
     </form>`
   document.querySelector('#f-login').addEventListener('submit', async (e) => {
     e.preventDefault()
     mensaje('Entrando…')
-    const { error } = await db.auth.signInWithPassword({ email: e.target.email.value.trim(), password: e.target.clave.value })
-    if (error) return mensaje('Email o contraseña incorrectos.', 'mal')
+    try { sessionStorage.setItem(CLAVE, e.target.clave.value) } catch { /* sin storage: no se puede entrar */ }
+    try { await api('login', { metodo: 'POST' }) } catch (err) { sessionStorage.removeItem(CLAVE); return mensaje(err.message === 'Clave incorrecta' ? 'Contraseña incorrecta.' : err.message, 'mal') }
     iniciar()
   })
 }
 
 async function iniciar() {
-  const { data: { session } } = await db.auth.getSession()
-  if (!session) return login()
-  const { data: esAdmin } = await db.rpc('geacofi_es_admin')
-  if (!esAdmin) { await db.auth.signOut(); return login('Ese usuario no tiene permiso para editar GeaCofi.') }
+  if (!clave()) return login()
+  try { await api('login', { metodo: 'POST' }) } catch { sessionStorage.removeItem(CLAVE); return login('La sesión venció. Volvé a entrar.') }
   editor()
 }
 
@@ -137,7 +141,7 @@ app.addEventListener('click', async (e) => {
     estado[lista].splice(Number(i), 1)
     editor()
   } else if (b.id === 'salir') {
-    await db.auth.signOut()
+    sessionStorage.removeItem(CLAVE)
     login()
   } else if (b.id === 'guardar') guardar(b)
 })
@@ -148,10 +152,8 @@ app.addEventListener('change', async (e) => {
   if (!ruta || !archivo) return
   mensaje('Subiendo foto…')
   try {
-    const nombre = `${ruta.split('.')[0]}/${Date.now()}.webp`
-    const { error } = await db.storage.from('geacofi').upload(nombre, await aWebp(archivo), { contentType: 'image/webp' })
-    if (error) throw error
-    set(ruta, db.storage.from('geacofi').getPublicUrl(nombre).data.publicUrl)
+    const { url } = await api('foto', { metodo: 'POST', cuerpo: await aWebp(archivo), tipo: 'image/webp' })
+    set(ruta, url)
     editor()
     mensaje('Foto subida. Falta tocar “Guardar”.', 'ok')
   } catch (err) {
@@ -159,7 +161,7 @@ app.addEventListener('change', async (e) => {
   }
 })
 
-// la foto se achica a 1200 px y pasa a webp: carga rápido y entra en el límite de 5 MB
+// la foto se achica a 1200 px y pasa a webp: carga rápido y entra en el límite de 3 MB
 async function aWebp(archivo) {
   const bmp = await createImageBitmap(archivo)
   const k = Math.min(1, 1200 / Math.max(bmp.width, bmp.height))
@@ -172,15 +174,19 @@ async function guardar(boton) {
   boton.disabled = true
   mensaje('Guardando…')
   const productos = Object.fromEntries(estado.productos.map(({ id, ...resto }) => [id, { ...resto, foto: resto.foto || undefined }]))
-  const filas = [
-    ['negocio', estado.negocio],
-    ['productos', productos],
-    ['eventos', estado.eventos.filter((e) => e.fecha && e.titulo)],
-    ['visitas', estado.visitas.filter((v) => v.src)],
-  ].map(([clave, valor]) => ({ clave, valor, actualizado: new Date().toISOString() }))
-  const { error } = await db.from('geacofi_contenido').upsert(filas)
+  const contenido = {
+    negocio: estado.negocio,
+    productos,
+    eventos: estado.eventos.filter((e) => e.fecha && e.titulo),
+    visitas: estado.visitas.filter((v) => v.src),
+  }
+  try {
+    await api('contenido', { metodo: 'PUT', cuerpo: JSON.stringify(contenido), tipo: 'application/json' })
+  } catch (err) {
+    boton.disabled = false
+    return mensaje(`No se guardó: ${err.message}`, 'mal')
+  }
   boton.disabled = false
-  if (error) return mensaje(`No se guardó: ${error.message}`, 'mal')
   mensaje('Guardado. Ya se ve en la web.', 'ok')
 }
 
