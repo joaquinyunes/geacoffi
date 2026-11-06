@@ -1,4 +1,6 @@
 .vercel
 .env*
+!.env.example
+respaldos/
 node_modules
 dist

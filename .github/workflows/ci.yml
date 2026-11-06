@@ -26,6 +26,8 @@ jobs:
       - run: npm run typecheck
       - run: npm test
       - run: npm run build
+      - name: Dependencias de producción sin vulnerabilidades altas
+        run: npm audit --omit=dev --audit-level=high
 
   secretos:
     name: Escaneo de secretos

@@ -1,3 +1,4 @@
+import { execFileSync } from 'node:child_process';
 import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 import { diferencias } from './auditoria';
 import { base32, codigo, nuevoSecreto, pasoValido } from './totp';
@@ -33,6 +34,19 @@ describe('contraseña con hash', () => {
     expect(claveCorrecta('una-clave-bien-larga')).toBe(true);
     expect(claveCorrecta('otra')).toBe(false);
     delete process.env.ADMIN_PASSWORD_HASH;
+  });
+});
+
+describe('tools/clave.mjs', () => {
+  it('imprime un hash y un secreto 2FA que el servidor acepta', () => {
+    const salida = execFileSync('node', ['tools/clave.mjs'], { env: { ...process.env, CLAVE: 'otra-clave-bien-larga' }, encoding: 'utf8' });
+    const hash = /ADMIN_PASSWORD_HASH=(\S+)/.exec(salida)![1], secreto = /ADMIN_TOTP_SECRET=(\S+)/.exec(salida)![1];
+    process.env.ADMIN_PASSWORD_HASH = hash;
+    expect(claveCorrecta('otra-clave-bien-larga')).toBe(true);
+    expect(claveCorrecta('otra-clave-bien-larg')).toBe(false);
+    delete process.env.ADMIN_PASSWORD_HASH;
+    expect(codigo(secreto)).toMatch(/^\d{6}$/);
+    expect(() => execFileSync('node', ['tools/clave.mjs'], { env: { ...process.env, CLAVE: 'corta' }, stdio: 'pipe' })).toThrow();
   });
 });
 

@@ -1,0 +1,33 @@
+name: Respaldo diario
+
+# Necesita los secretos MONGODB_URI y BACKUP_CLAVE (Settings > Secrets > Actions). Sin BACKUP_CLAVE falla a propósito:
+# el archivo tiene datos de clientes y NUNCA debe quedar sin cifrar. Si el repositorio es público, mejor hacerlo privado
+# o correr tools/backup.mjs desde tu computadora (ver docs/SEGURIDAD.md).
+on:
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  respaldo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: node tools/backup.mjs respaldos
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          MONGODB_DB: ${{ vars.MONGODB_DB || 'geacoffi' }}
+          BACKUP_CLAVE: ${{ secrets.BACKUP_CLAVE }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: respaldo-geacoffi
+          path: respaldos/*.cifrado.json.gz
+          retention-days: 30

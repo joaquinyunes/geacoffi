@@ -26,10 +26,10 @@ export function json(res: Res, estado: number, cuerpo: unknown) {
   res.end(JSON.stringify(cuerpo));
 }
 
-/** IP del visitante: Vercel y Render la ponen en estos encabezados; en local cae al socket. */
+/** IP del visitante. En Vercel los encabezados x-vercel-forwarded-for / x-real-ip los pone la plataforma y no se pueden falsear; detrás de otros proxies (Render) el primer valor de x-forwarded-for sí puede inventarlo el cliente, por eso el login tiene además un tope general. En local cae al socket. */
 export function ip(req: Req): string {
   const h = (n: string) => { const v = req.headers[n]; return (Array.isArray(v) ? v[0] : v)?.split(',')[0].trim(); };
-  return h('x-real-ip') || h('x-forwarded-for') || req.socket?.remoteAddress || 'desconocida';
+  return h('x-vercel-forwarded-for') || h('x-real-ip') || h('x-forwarded-for') || req.socket?.remoteAddress || 'desconocida';
 }
 
 export class CuerpoGrande extends Error {}

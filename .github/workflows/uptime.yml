@@ -1,0 +1,21 @@
+name: Monitoreo
+
+# Cada 15 minutos pide /api/salud. Si falla, el job queda en rojo y GitHub avisa por mail al dueño del repo.
+# Cargá la variable SITIO_URL (Settings > Variables > Actions), ej. https://geacofi.com.ar
+on:
+  schedule:
+    - cron: '*/15 * * * *'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  salud:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Pedir /api/salud
+        env:
+          SITIO_URL: ${{ vars.SITIO_URL }}
+        run: |
+          if [ -z "$SITIO_URL" ]; then echo "Falta la variable SITIO_URL"; exit 1; fi
+          curl --fail --silent --show-error --max-time 20 --retry 2 --retry-delay 10 "$SITIO_URL/api/salud"

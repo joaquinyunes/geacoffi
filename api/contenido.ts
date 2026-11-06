@@ -27,7 +27,7 @@ export default ruta(async (req, res) => {
   const antes = new Map((await col.find({ _id: { $in: Object.keys(nuevo) } }).toArray()).map((f) => [f._id, f.valor]));
   const ahora = new Date();
   await col.bulkWrite(Object.entries(nuevo).map(([_id, valor]) => ({ updateOne: { filter: { _id }, update: { $set: { valor, actualizado: ahora } }, upsert: true } })));
-  const cambios = Object.entries(nuevo).flatMap(([seccion, valor]) => diferencias(antes.get(seccion) ?? null, valor, seccion));
+  const cambios = Object.entries(nuevo).flatMap(([seccion, valor]) => diferencias(antes.get(seccion) ?? (Array.isArray(valor) ? [] : {}), valor, seccion));
   if (cambios.length) await registrar(req, 'guardó cambios', cambios);
   json(res, 200, { ok: true, cambios: cambios.length });
 });
