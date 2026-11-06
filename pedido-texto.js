@@ -18,8 +18,8 @@ export function totales(lineas, modo, envio = {}) {
   return { sub, costo, total, bajoMinimo }
 }
 
-/** datos: { lineas, modo, hora, nombre, direccion, referencias, envio, total } */
-export function armarMensaje({ lineas, modo, hora, nombre, direccion = '', referencias = '', envio = {}, total = null }) {
+/** datos: { lineas, modo, hora, nombre, direccion, referencias, envio, total, ref }. `ref` = código corto del pedido registrado en el panel (si lo hay). */
+export function armarMensaje({ lineas, modo, hora, nombre, direccion = '', referencias = '', envio = {}, total = null, ref = '' }) {
   const t = totales(lineas, modo, envio)
   const cuerpo = lineas.flatMap((l) => {
     const det = detalleLinea(l)
@@ -34,6 +34,7 @@ export function armarMensaje({ lineas, modo, hora, nombre, direccion = '', refer
     `Horario: ${hora} h`,
     modo === 'envio' ? `Envío: ${t.costo === null ? 'a confirmar' : t.costo ? pesos(t.costo) : 'sin cargo'}` : '',
     `Total: ${(total ?? t.total) === null ? 'a confirmar' : pesos(total ?? t.total)}`,
+    ref ? `Pedido #${ref}` : '',
   ].filter((x) => x !== '').join('\n')
 }
 

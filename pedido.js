@@ -3,10 +3,12 @@
    Carrito de la página Carta. "Agregar al pedido" en cada producto, en cada
    pareja y en "Elegí el tuyo"; un diálogo para personalizar cada línea, elegir
    local / llevar / envío y el horario; y un ticket de confirmación con fotos.
-   El pedido sale armado por WhatsApp. Datos editables en negocio.js.
+   El pedido sale armado por WhatsApp (siempre: es el respaldo) y además se registra en /api/pedido para que el
+   local lo acepte y el cliente vea el estado en el ticket. Datos editables en negocio.js.
    ========================================================================== */
 import { NEGOCIO, PRODUCTOS, PAREJAS, ELEGI, foto } from './negocio.js'
 import { armarMensaje, detalleLinea, MODOS, pesos, totales, urlWhatsapp } from './pedido-texto.js'
+import { textoEstado } from './mensajes.js'
 
 const $ = (s, r = document) => r.querySelector(s)
 const $$ = (s, r = document) => [...r.querySelectorAll(s)]
@@ -18,6 +20,7 @@ const porNombre = (n) => PRODUCTOS.find((p) => p.nombre.toLowerCase() === n.trim
 let lineas = [] // { uid, id, cant, opc: { Leche: 'Común' }, nota }
 let uid = 0
 let ultimo = null // lo último que se mandó: { texto, datos }
+let seguimiento = null // temporizador que consulta el estado del pedido mientras el ticket está abierto
 const opcionesPorDefecto = (p) => Object.fromEntries(p.opciones.map((o) => [o.nombre, o.valores[0]]))
 const cantidad = (id) => lineas.filter((l) => l.id === id).reduce((s, l) => s + l.cant, 0)
 const totalUnidades = () => lineas.reduce((s, l) => s + l.cant, 0)
@@ -211,6 +214,7 @@ function mostrarTicket(datos, texto, abrio) {
     <div class="p-form">
       <div class="p-cab"><span class="p-check" aria-hidden="true">✓</span><button type="button" class="p-x" data-act="cerrar" aria-label="Cerrar">×</button></div>
       <h2 id="p-titulo-t" tabindex="-1">Tu pedido está armado</h2>
+      <div class="p-estado" id="p-estado" role="status" aria-live="polite"></div>
       <p class="p-paso">${abrio
         ? 'Último paso: <b>enviá el mensaje en WhatsApp</b> para que lo recibamos.'
         : 'Último paso: abrimos el chat y copiamos tu pedido. <b>Pegalo y enviá el mensaje</b> para que lo recibamos.'} ${esc(NEGOCIO.respuesta)}</p>
@@ -248,6 +252,61 @@ function enviarWhatsApp(texto) {
 function volverAlForm() {
   $('[data-vista=form]', dialogo).hidden = false
   $('[data-vista=ticket]', dialogo).hidden = true
+}
+
+/* ---------- registro y estado del pedido ---------- */
+function nuevoId() {
+  if (crypto.randomUUID) return crypto.randomUUID()
+  const h = [...crypto.getRandomValues(new Uint8Array(16))].map((x) => x.toString(16).padStart(2, '0')).join('')
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`
+}
+
+const FINALES = ['entregado', 'rechazado']
+
+/** Registra el pedido en el servidor. true = quedó registrado; false = no (el WhatsApp ya salió igual). Reintenta una vez si es un corte de red o un error del servidor. */
+async function registrarPedido(id, datos, texto, total) {
+  const cuerpo = JSON.stringify({
+    id, modo: datos.modo, hora: datos.hora, nombre: datos.nombre, direccion: datos.direccion, referencias: datos.referencias, total, texto,
+    lineas: datos.lineas.map(({ nombre, cant, precio, opc, nota }) => ({ nombre, cant, precio, opc, nota })),
+  })
+  for (let intento = 0; intento < 2; intento++) {
+    try {
+      const r = await fetch('/api/pedido', { method: 'POST', headers: { 'content-type': 'application/json' }, body: cuerpo, signal: AbortSignal.timeout(6000) })
+      if (r.ok || r.status === 409) return true
+      if (r.status < 500 && r.status !== 429) return false // el servidor lo entendió y lo rechazó: reintentar no sirve
+    } catch { /* sin red: se reintenta */ }
+    await new Promise((ok) => setTimeout(ok, 2500))
+  }
+  return false
+}
+
+function pintarEstado({ tono, titulo, detalle }) {
+  const el = $('#p-estado', dialogo)
+  if (el) el.innerHTML = `<p class="p-estado-${tono}"><b>${esc(titulo)}</b>${detalle ? ` · ${esc(detalle)}` : ''}</p>`
+}
+
+function pintarFallo() {
+  const el = $('#p-estado', dialogo)
+  if (el) el.innerHTML = '<p class="p-estado-mal" role="alert"><b>No pudimos registrar tu pedido en el sistema.</b> No pasa nada: lo que vale es el mensaje de WhatsApp. Enviálo y te confirmamos por ahí.</p>'
+}
+
+function detenerSeguimiento() { clearInterval(seguimiento); seguimiento = null }
+
+/** Consulta el estado cada 15 s mientras el ticket esté abierto, hasta que el pedido se entrega o se rechaza. */
+function seguirPedido(id) {
+  const consultar = async () => {
+    if (!dialogo.open || $('[data-vista=ticket]', dialogo).hidden) return detenerSeguimiento()
+    try {
+      const r = await fetch(`/api/pedido?id=${id}`, { signal: AbortSignal.timeout(6000) })
+      if (!r.ok) return
+      const p = await r.json()
+      pintarEstado(textoEstado(p.estado, p.motivo))
+      if (FINALES.includes(p.estado)) detenerSeguimiento()
+    } catch { /* sin red: se vuelve a intentar en 15 s */ }
+  }
+  pintarEstado(textoEstado('recibido'))
+  detenerSeguimiento()
+  seguimiento = setInterval(consultar, 15_000)
 }
 
 /* ---------- eventos ---------- */
@@ -302,6 +361,7 @@ dialogo.addEventListener('change', (e) => {
 
 form.addEventListener('submit', (e) => {
   e.preventDefault()
+  detenerSeguimiento()
   const f = new FormData(form)
   const modo = modoActual()
   const datos = {
@@ -314,10 +374,14 @@ form.addEventListener('submit', (e) => {
     avisoEl.hidden = false
     return
   }
-  const texto = armarMensaje({ ...datos, total: t.total })
+  // El código va dentro del WhatsApp: si el registro falla, el local ve el código en el chat y no lo encuentra en el panel.
+  const id = nuevoId(), ref = id.slice(0, 4).toUpperCase()
+  const texto = armarMensaje({ ...datos, total: t.total, ref })
   ultimo = { texto, datos }
-  const abrio = enviarWhatsApp(texto)
+  const abrio = enviarWhatsApp(texto) // primero WhatsApp, dentro del gesto del usuario (si no, el navegador bloquea la ventana)
   mostrarTicket(datos, texto, abrio)
+  pintarEstado({ tono: 'espera', titulo: 'Registrando tu pedido…', detalle: '' })
+  registrarPedido(id, datos, texto, t.total).then((ok) => ok ? seguirPedido(id) : pintarFallo())
 })
 
 // "Armá tu pedido" (armar.js) manda lo elegido: se arma el carrito y se abre el diálogo
@@ -329,7 +393,7 @@ document.addEventListener('gc:pedir', (e) => {
   volverAlForm(); pintarModo(); dialogo.showModal()
 })
 
-dialogo.addEventListener('close', volverAlForm)
+dialogo.addEventListener('close', () => { detenerSeguimiento(); volverAlForm() })
 // main.js frena el wheel de toda la ventana (scroll suave); dentro del diálogo tiene que scrollear nativo.
 dialogo.addEventListener('wheel', (e) => e.stopPropagation())
 pintar()

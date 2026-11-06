@@ -1,34 +1,15 @@
-import { createServer, type Server } from 'node:http';
-import type { AddressInfo } from 'node:net';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
-import { MongoMemoryServer } from 'mongodb-memory-server';
-import contenido from '../api/contenido';
-import login from '../api/login';
-import foto from '../api/foto';
-import { contenidoValido, tipoDeImagen } from './foto';
+import { contenidoValido, errorDeContenido, tipoDeImagen } from './foto';
+import { entrar, levantar } from './prueba';
 
-let mongo: MongoMemoryServer;
-let servidor: Server;
-let base: string;
-
-const handlers: Record<string, (req: never, res: never) => Promise<void>> = { '/api/contenido': contenido as never, '/api/login': login as never, '/api/foto': foto as never };
+let base: string, cerrar: () => Promise<void>, admin: Record<string, string>;
 
 beforeAll(async () => {
-  mongo = await MongoMemoryServer.create();
-  process.env.MONGODB_URI = mongo.getUri();
-  process.env.MONGODB_DB = 'geacoffi-test';
-  process.env.ADMIN_PASSWORD = 'clave-de-prueba';
-  servidor = createServer((req, res) => handlers[(req.url ?? '').split('?')[0]](req as never, res as never));
-  await new Promise<void>((ok) => servidor.listen(0, '127.0.0.1', ok));
-  base = `http://127.0.0.1:${(servidor.address() as AddressInfo).port}`;
+  ({ base, cerrar } = await levantar());
+  admin = await entrar(base);
 });
+afterAll(() => cerrar());
 
-afterAll(async () => {
-  servidor.close();
-  await mongo.stop();
-});
-
-const admin = { 'x-admin-clave': 'clave-de-prueba' };
 const put = (cuerpo: unknown, headers: Record<string, string> = admin) =>
   fetch(`${base}/api/contenido`, { method: 'PUT', headers: { 'content-type': 'application/json', ...headers }, body: JSON.stringify(cuerpo) });
 
@@ -39,9 +20,10 @@ describe('contenido editable en MongoDB', () => {
     expect(await r.json()).toEqual({});
   });
 
-  it('guardar exige la clave del panel', async () => {
-    expect((await put({ negocio: { telefono: '1' } }, {})).status).toBe(401);
-    expect((await put({ negocio: { telefono: '1' } }, { 'x-admin-clave': 'otra' })).status).toBe(401);
+  it('guardar exige sesión del panel (y el encabezado x-gc contra CSRF)', async () => {
+    expect((await put({ negocio: { telefono: '1' } }, { 'x-gc': '1' })).status).toBe(401);
+    expect((await put({ negocio: { telefono: '1' } }, { cookie: 'gc_sesion=inventada', 'x-gc': '1' })).status).toBe(401);
+    expect((await put({ negocio: { telefono: '1' } }, { cookie: admin.cookie })).status).toBe(403); // cookie buena pero sin x-gc: como un formulario de otro sitio
   });
 
   it('lo guardado se lee igual, y guardar de nuevo pisa solo esa sección', async () => {
@@ -52,12 +34,26 @@ describe('contenido editable en MongoDB', () => {
     expect(c.eventos).toEqual([{ fecha: '2026-11-01', titulo: 'Tarde de mates' }]);
   });
 
-  it('rechaza claves desconocidas, JSON roto y listas enormes', async () => {
-    expect((await put({ hack: { a: 1 } })).status).toBe(400);
-    expect((await put({})).status).toBe(400);
+  it('rechaza claves desconocidas, JSON roto y listas enormes, siempre con un mensaje en castellano', async () => {
+    for (const mala of [{ hack: { a: 1 } }, {}, { visitas: Array.from({ length: 201 }, () => ({})) }]) {
+      const r = await put(mala);
+      expect(r.status).toBe(400);
+      expect((await r.json()).error).toMatch(/[a-záéíóú]{4}/i);
+    }
     const roto = await fetch(`${base}/api/contenido`, { method: 'PUT', headers: { ...admin }, body: '{no es json' });
     expect(roto.status).toBe(400);
-    expect((await put({ visitas: Array.from({ length: 201 }, () => ({})) })).status).toBe(400);
+    expect(await roto.json()).toEqual({ error: expect.not.stringMatching(/JSON|SyntaxError|Unexpected/) });
+  });
+
+  it('rechaza operadores de Mongo ($, .) en cualquier nivel y valores fuera de rango', () => {
+    expect(errorDeContenido({ negocio: { $where: '1' } })).toBeTruthy();
+    expect(errorDeContenido({ productos: { cafe: { nombre: 'x', precio: { $gt: 0 } } } })).toBeTruthy();
+    expect(errorDeContenido({ negocio: { 'a.b': 1 } })).toBeTruthy();
+    expect(errorDeContenido({ productos: { cafe: { precio: -5 } } })).toMatch(/precio/);
+    expect(errorDeContenido({ negocio: { telefono: '+54 9 351' } })).toMatch(/WhatsApp/);
+    expect(errorDeContenido({ eventos: [{ fecha: '2026-13-45', titulo: 'x' }] })).toMatch(/fecha/);
+    expect(errorDeContenido({ visitas: [{ src: 'https://malo.example/x.png' }] })).toMatch(/foto/);
+    expect(errorDeContenido({ visitas: [{ src: 'javascript:alert(1)' }] })).toMatch(/foto/);
   });
 
   it('contenidoValido solo acepta secciones conocidas', () => {
@@ -66,33 +62,59 @@ describe('contenido editable en MongoDB', () => {
     expect(contenidoValido([])).toBe(false);
     expect(contenidoValido(null)).toBe(false);
   });
+
+  it('cada cambio queda en el registro de auditoría, que solo se puede leer', async () => {
+    await put({ productos: { medialuna: { nombre: 'Medialuna', precio: 900 } } });
+    await put({ productos: { medialuna: { nombre: 'Medialuna', precio: 1100 } } });
+    const reg = await (await fetch(`${base}/api/auditoria`, { headers: admin })).json();
+    const cambio = reg.flatMap((r: { cambios: { campo: string; antes: unknown; despues: unknown }[] }) => r.cambios).find((c: { campo: string; antes: unknown }) => c.campo === 'productos.medialuna.precio' && c.antes === 900);
+    expect(cambio).toMatchObject({ despues: 1100 });
+    expect(reg.some((r: { accion: string }) => r.accion === 'entró al panel')).toBe(true);
+    expect((await fetch(`${base}/api/auditoria`, { method: 'DELETE', headers: admin })).status).toBe(405);
+    expect((await fetch(`${base}/api/auditoria`)).status).toBe(401);
+  });
 });
 
-describe('login y fotos', () => {
-  it('login responde 204 con la clave y 401 sin ella', async () => {
-    expect((await fetch(`${base}/api/login`, { method: 'POST', headers: admin })).status).toBe(204);
-    expect((await fetch(`${base}/api/login`, { method: 'POST', headers: { 'x-admin-clave': 'mal' } })).status).toBe(401);
-  });
+describe('fotos', () => {
+  const png = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
+  const sube = (cuerpo: BodyInit, headers: Record<string, string> = admin) => fetch(`${base}/api/foto`, { method: 'POST', headers, body: cuerpo });
 
   it('la url de la foto usa el protocolo real del pedido (http en local, https detrás del proxy de Vercel)', async () => {
-    const png = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
-    const local = await (await fetch(`${base}/api/foto`, { method: 'POST', headers: admin, body: png })).json();
-    expect(new URL(local.url).protocol).toBe('http:');
-    const proxy = await (await fetch(`${base}/api/foto`, { method: 'POST', headers: { ...admin, 'x-forwarded-proto': 'https' }, body: png })).json();
-    expect(new URL(proxy.url).protocol).toBe('https:');
+    expect(new URL((await (await sube(png)).json()).url).protocol).toBe('http:');
+    expect(new URL((await (await sube(png, { ...admin, 'x-forwarded-proto': 'https' })).json()).url).protocol).toBe('https:');
   });
 
-  it('sube una foto real y la devuelve; rechaza lo que no es imagen', async () => {
-    const png = Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0]);
+  it('sube una foto real y la devuelve sin permitir que ejecute nada', async () => {
     expect(tipoDeImagen(png)).toBe('image/png');
-    const sube = await fetch(`${base}/api/foto`, { method: 'POST', headers: admin, body: png });
-    expect(sube.status).toBe(201);
-    const { url } = await sube.json();
+    const r = await sube(png);
+    expect(r.status).toBe(201);
+    const { url } = await r.json();
     const lee = await fetch(`${base}/api/foto?id=${new URL(url).searchParams.get('id')}`);
     expect(lee.status).toBe(200);
     expect(lee.headers.get('content-type')).toBe('image/png');
+    expect(lee.headers.get('x-content-type-options')).toBe('nosniff');
+    expect(lee.headers.get('content-security-policy')).toContain("default-src 'none'");
     expect(new Uint8Array(await lee.arrayBuffer())).toEqual(png);
-    expect((await fetch(`${base}/api/foto`, { method: 'POST', headers: admin, body: 'no soy una imagen' })).status).toBe(400);
-    expect((await fetch(`${base}/api/foto`, { method: 'POST', body: png })).status).toBe(401);
+  });
+
+  it('el tipo se decide por los bytes: un SVG, un HTML o un .exe disfrazados de imagen se rechazan', async () => {
+    for (const falso of ['no soy una imagen', '<svg xmlns="http://www.w3.org/2000/svg"><script>alert(1)</script></svg>', '<html><script>alert(1)</script>', 'MZ\x90\x00 programa']) {
+      const r = await sube(falso, { ...admin, 'content-type': 'image/png' });
+      expect(r.status).toBe(400);
+      expect((await r.json()).error).toMatch(/JPG, PNG o WebP/);
+    }
+    const jpg = Uint8Array.from([0xff, 0xd8, 0xff, 0xe0, 0, 0, 0, 0]);
+    expect(tipoDeImagen(jpg)).toBe('image/jpeg');
+    expect(tipoDeImagen(new TextEncoder().encode('RIFF\0\0\0\0WEBPVP8 '))).toBe('image/webp');
+    expect(tipoDeImagen(Uint8Array.from([0x89, 0x50, 0x4e, 0x47, 0, 0, 0, 0, 0, 0, 0, 0]))).toBe(null); // firma PNG incompleta
+  });
+
+  it('corta en 3 MB y exige sesión', async () => {
+    const grande = new Uint8Array(3_000_001); grande.set(png);
+    const r = await sube(grande);
+    expect(r.status).toBe(413);
+    expect((await r.json()).error).toMatch(/demasiado grande/);
+    expect((await sube(png, {})).status).toBe(403);
+    expect((await sube(png, { 'x-gc': '1' })).status).toBe(401);
   });
 });

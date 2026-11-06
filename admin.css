@@ -1,0 +1,31 @@
+:root { --fondo: #faf6f0; --tinta: #2a1e17; --suave: #6b5b4f; --linea: #e3d8cb; --acento: #5a3a26; --ok: #2f6b3a; --mal: #a3322b; --aviso: #8a5a00; color-scheme: light dark; }
+@media (prefers-color-scheme: dark) { :root { --fondo: #1d1612; --tinta: #f1e8de; --suave: #b3a395; --linea: #3a2d25; --acento: #d9b48f; --ok: #7bc48a; --mal: #ef8a82; --aviso: #e8bd5e; } }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--fondo); color: var(--tinta); font: 16px/1.4 system-ui, sans-serif; }
+main { max-width: 640px; margin: 0 auto; padding: 16px 16px 120px; }
+h1 { font-size: 1.4rem; margin: 8px 0 16px; }
+h2 { font-size: 1.1rem; margin: 28px 0 8px; padding-top: 16px; border-top: 1px solid var(--linea); }
+label { display: block; font-size: .85rem; color: var(--suave); margin: 10px 0 4px; }
+input, textarea { width: 100%; padding: 10px; font: inherit; color: inherit; background: transparent; border: 1px solid var(--linea); border-radius: 8px; }
+input[type=checkbox] { width: auto; margin-right: 8px; }
+.fila { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.tarjeta { border: 1px solid var(--linea); border-radius: 12px; padding: 12px; margin: 12px 0; }
+.tarjeta img { width: 96px; height: 96px; object-fit: cover; border-radius: 8px; display: block; margin-bottom: 8px; background: var(--linea); }
+button { font: inherit; min-height: 44px; padding: 10px 16px; border-radius: 999px; border: 1px solid var(--acento); background: transparent; color: var(--acento); cursor: pointer; }
+button.pri { background: var(--acento); color: var(--fondo); }
+button.peligro { border-color: var(--mal); color: var(--mal); }
+button:disabled { opacity: .5; cursor: default; }
+.barra { position: fixed; left: 0; right: 0; bottom: 0; padding: 12px 16px; background: var(--fondo); border-top: 1px solid var(--linea); display: flex; gap: 12px; align-items: center; justify-content: center; }
+#msg { min-height: 1.2em; font-size: .9rem; }
+#msg.ok { color: var(--ok); } #msg.mal { color: var(--mal); }
+:focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+.nota { font-size: .85rem; color: var(--suave); }
+.pedido-estado { display: inline-block; font-size: .8rem; padding: 2px 10px; border-radius: 999px; border: 1px solid var(--linea); }
+.pedido-estado.recibido { border-color: var(--aviso); color: var(--aviso); }
+.pedido-estado.aceptado, .pedido-estado.listo { border-color: var(--ok); color: var(--ok); }
+.pedido-estado.rechazado { border-color: var(--mal); color: var(--mal); }
+.atrasado { color: var(--mal); font-weight: 600; }
+.pedido-acciones { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.registro { font-size: .85rem; margin: 6px 0; padding: 6px 0; border-bottom: 1px solid var(--linea); }
+details summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; }
+.err { color: var(--mal); }

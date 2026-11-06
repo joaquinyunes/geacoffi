@@ -8,7 +8,7 @@ const apiLocal = (): Plugin => ({
   configureServer(server) {
     Object.assign(process.env, loadEnv(server.config.mode, process.cwd(), ''))
     server.middlewares.use(async (req, res, next) => {
-      const nombre = /^\/api\/(contenido|foto|login)(\?|$)/.exec(req.url ?? '')?.[1]
+      const nombre = /^\/api\/(contenido|foto|login|pedido|auditoria|salud)(\?|$)/.exec(req.url ?? '')?.[1]
       if (!nombre) return next()
       await (await server.ssrLoadModule(`/api/${nombre}.ts`)).default(req, res)
     })
@@ -22,5 +22,5 @@ export default defineConfig({
     // sitio de varias páginas: cada .html de la raíz es una entrada (rutas relativas a la raíz del proyecto)
     rollupOptions: { input: { main: 'index.html', detalles: 'detalles.html', carta: 'carta.html', armar: 'armar.html', admin: 'admin.html' } },
   },
-  test: { environment: 'node' },
+  test: { environment: 'node', hookTimeout: 60_000, testTimeout: 30_000 }, // cada archivo de server/ levanta su propio Mongo en memoria
 })

@@ -41,3 +41,9 @@ test('detalleLinea junta opciones y nota', () => {
 test('la url codifica el texto', () => {
   expect(urlWhatsapp('5491100000000', 'a b\nc')).toBe('https://wa.me/5491100000000?text=a%20b%0Ac')
 })
+
+test('el mensaje lleva el código del pedido para cruzarlo con el panel', () => {
+  const m = armarMensaje({ lineas: [medialuna], modo: 'local', hora: '10:00', nombre: '', ref: 'A1B2' })
+  expect(m.split('\n').at(-1)).toBe('Pedido #A1B2')
+  expect(armarMensaje({ lineas: [medialuna], modo: 'local', hora: '10:00', nombre: '' })).not.toContain('Pedido #')
+})
