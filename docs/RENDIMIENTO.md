@@ -33,3 +33,16 @@ Los tiempos de carga en localhost (~0,2 s) **no representan** una red de celular
 - Los `.jpg`/`.png` de `public/` quedan sin usar en el código de las páginas; no los borré (requiere tu permiso y se publican en `dist`).
 - Fuentes: ya vienen de Google Fonts con `display=swap` y subconjunto latino; no se tocaron.
 - Sin throttling de red ni dispositivo real: no pude confirmar "< 3 s" en un celular; por bytes (0,87 MB) debería cumplirlo.
+
+## Re-medición del 08/11/2026 (G6) — build de `integracion` con las ramas fusionadas
+Mismo método (navegador integrado a 375 px, `vite build` servido con `tools/servir.mjs`, que aplica gzip y los mismos encabezados que Vercel, CSP en modo bloqueo, 9 s sin hacer scroll):
+
+| Página | Pedidos | Bytes (encodedBodySize) | Resultado |
+|---|---|---|---|
+| Portada `/` (celular) | 16 | **858.078 B = 0,82 MiB** (JS principal 171.599 B gzip + 10 imágenes WebP de los planos) | ✅ **< 1 MB** |
+| `/admin.html` (panel, con sesión) | 14 | 176.842 B | ✅ |
+| Carga en localhost | — | DOMContentLoaded 310 ms · load 487 ms | no representa una red de celular |
+
+- La CSP en bloqueo no cambió el peso ni rompió el 3D: portada, detalles, carta y armar sin violaciones; el scroll 3D se ve igual.
+- **No medido:** tiempo en producción real y en red de celular. El deploy de Vercel que existe (`geacoffi`) sigue en el primer commit; hasta que el usuario cargue las variables y redeploye (G7) no hay URL de producción con esta versión. Cuando exista: `node tools/verificar-instancia.mjs <url>` y repetir esta tabla con DevTools en «Slow 4G». FCP/LCP no los expone el navegador integrado.
+- Los fotogramas de `#ai` (~61 archivos, ~3 MB en celular) se piden al acercarse a esa sección: no se re-midieron.

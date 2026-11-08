@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>La web de tu café, editable desde el celular</title>
+<meta name="description" content="Web de café con carta, eventos y pedidos con estado que el dueño edita solo desde un panel, sin tocar código, y que carga rápido en el celular." />
+<style>
+  :root { --fondo: #faf6f0; --tinta: #2a1e17; --suave: #6b5b4f; --linea: #e3d8cb; --acento: #5a3a26; --caramelo: #d8802f; }
+  @media (prefers-color-scheme: dark) { :root { --fondo: #1d1612; --tinta: #f1e8de; --suave: #b3a395; --linea: #3a2d25; --acento: #d9b48f; } }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fondo); color: var(--tinta); font: 17px/1.55 system-ui, sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 0 16px 64px; }
+  h1 { font-size: clamp(1.8rem, 6vw, 2.6rem); line-height: 1.15; margin: 40px 0 12px; }
+  h2 { font-size: 1.4rem; margin: 48px 0 8px; }
+  p, li { margin: 8px 0; }
+  .suave { color: var(--suave); }
+  .boton { display: inline-block; background: var(--acento); color: var(--fondo); padding: 12px 22px; border-radius: 999px; text-decoration: none; min-height: 44px; font-weight: 600; }
+  img { max-width: 100%; border-radius: 12px; border: 1px solid var(--linea); }
+  .fotos { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; align-items: start; }
+  table { border-collapse: collapse; width: 100%; font-size: .95rem; }
+  th, td { border: 1px solid var(--linea); padding: 8px; text-align: left; vertical-align: top; }
+  .nota { border-left: 4px solid var(--caramelo); padding: 6px 12px; background: rgb(216 128 47 / .1); border-radius: 4px; }
+  :focus-visible { outline: 3px solid var(--acento); outline-offset: 2px; }
+</style>
+</head>
+<body>
+<main>
+  <h1>La web de tu café con carta, eventos y pedidos que editás vos desde el celular</h1>
+  <p class="suave">Para cafeterías que hoy cambian un precio llamando a quien les hizo la página, y reciben pedidos por WhatsApp sin saber cuáles quedaron atendidos.</p>
+  <p><a class="boton" href="#contacto">Hablemos</a></p>
+
+  <h2>El problema</h2>
+  <ul>
+    <li>Cambiar un precio, sumar un evento o cambiar una foto depende de una persona y tarda días.</li>
+    <li>Los pedidos llegan por WhatsApp y el cliente no sabe si el local los vio.</li>
+    <li>La página es lenta en el celular, que es desde donde pide casi todo el mundo.</li>
+    <li>Las plantillas se ven todas iguales, y las tiendas online cobran comisión por cada venta.</li>
+  </ul>
+
+  <h2>Qué hace</h2>
+  <ul>
+    <li><b>Panel con contraseña y código del celular:</b> cambiás precios, carta, eventos, fotos y horarios sin tocar código. Queda registro de quién cambió qué.</li>
+    <li><b>Pedidos con estado:</b> el cliente arma su pedido en la carta; vos lo aceptás o rechazás (con motivo) desde el panel y él lo ve en su pantalla. <b>El pedido sale siempre también por WhatsApp</b>, con un código: si algo falla, no se pierde.</li>
+    <li><b>Rápida en el celular:</b> la portada pesa menos de 1 MB (medido: 0,82 MB), con el diseño 3D de scroll.</li>
+    <li><b>Seguridad de verdad:</b> respaldo diario cifrado, aviso si el sitio se cae, protección contra intentos de entrada.</li>
+    <li><b>Todo a tu nombre:</b> dominio, hosting, base de datos y código son tuyos.</li>
+  </ul>
+
+  <h2>Cómo se ve</h2>
+  <p class="suave">Capturas de la versión actual, en un entorno de prueba (no son datos de un cliente).</p>
+  <div class="fotos">
+    <figure style="margin:0"><img src="img/sitio.jpg" alt="Portada del sitio con diseño 3D de scroll" loading="lazy" /><figcaption class="suave">La web.</figcaption></figure>
+    <figure style="margin:0"><img src="img/panel-pedidos.jpg" alt="Panel con un pedido para aceptar o rechazar" loading="lazy" /><figcaption class="suave">El panel: un pedido nuevo.</figcaption></figure>
+    <figure style="margin:0"><img src="img/panel-carta.jpg" alt="Panel con la carta y sus precios" loading="lazy" /><figcaption class="suave">El panel: la carta.</figcaption></figure>
+  </div>
+  <p class="nota">[COMPLETAR: video de 20–30 segundos mostrando «cambio un precio en el panel y se ve en la web». Se graba con el entorno de demo, no con el real.]</p>
+
+  <h2>Precio (propuesta, a validar)</h2>
+  <table>
+    <tr><th></th><th>Instalación</th><th>Mensual</th><th>Completo</th></tr>
+    <tr><td>Precio</td><td>USD 400 (único)</td><td>USD 25 / mes</td><td>USD 1.500 + USD 45 / mes (12 meses de mantenimiento incluidos)</td></tr>
+    <tr><td>Incluye</td><td>Sitio + panel con 2FA + tus datos cargados + capacitación</td><td>Hosting, respaldo diario, actualizaciones, soporte en 1 día hábil</td><td>Todo + estado del pedido + Mercado Pago + WhatsApp API + factura electrónica</td></tr>
+  </table>
+  <p class="nota"><b>Con honestidad:</b> a 3 años no es más barato que una suscripción (Tiendanube Esencial ≈ USD 504, Wix Light USD 640, Wix Core USD 1.072; GeaCofi Instalación + mensual USD 1.300). Lo que comprás es diseño propio, un panel hecho para tu café, <b>cero comisión por venta</b> y que todo sea tuyo. Cuentas y fuentes en <a href="../COSTO-3-ANOS.md">COSTO-3-ANOS</a> (precios tomados el 06/11/2026).</p>
+
+  <h2>Caso real</h2>
+  <p><b>GeaCofi</b> (café de especialidad, 9 de Julio 996): es el primer café con este sistema. <span class="nota">[COMPLETAR cuando esté en producción: fecha de salida, qué cambió para el dueño y una frase suya. Hoy el sitio está listo pero <b>todavía sin publicar con base real</b>: no se puede citar un resultado de uso.]</span></p>
+
+  <h2 id="contacto">Contacto</h2>
+  <p>[COMPLETAR: nombre, WhatsApp y mail de quien vende]. Respondemos en 1 día hábil.</p>
+</main>
+</body>
+</html>
