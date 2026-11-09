@@ -874,8 +874,15 @@ async function boot() {
   document.dispatchEvent(new Event('gc:ready'))
   // llegada con ancla desde otra página (ej: /#eventos): el navegador saltó antes de medir las secciones fijadas
   try { const t = location.hash && $(location.hash); if (t) scrollTo({ top: t.getBoundingClientRect().top + scrollY, behavior: 'instant' }) } catch { /* ancla inválida */ }
-  // los fotogramas se piden recién cuando la sección #ai está a una pantalla de distancia
-  if (seqSec) new IntersectionObserver((e, ob) => { if (e[0].isIntersecting) { ob.disconnect(); loadSequence() } }, { rootMargin: '100% 0px' }).observe(seqSec)
+  // Los fotogramas (~3 MB en celular) se piden recién cuando la persona empieza a mover la página o cuando #ai ya está a la vista (ancla directa).
+  // Antes se pedían con la sección a una pantalla de distancia: como #ai viene pegada al hero, eso pasaba en la carga y la portada pesaba 2,2 MB en celular.
+  if (seqSec) {
+    let arrancado = false
+    const arrancar = () => { if (arrancado) return; arrancado = true; io.disconnect(); loadSequence() }
+    const io = new IntersectionObserver((e) => { if (e[0].isIntersecting) arrancar() }, { rootMargin: '-15% 0px' })
+    io.observe(seqSec)
+    for (const ev of ['wheel', 'touchmove', 'keydown']) addEventListener(ev, arrancar, { once: true, passive: true })
+  }
   if ($('#preloader')) {
     const tl = gsap.timeline()
     tl.to('#preloader', { yPercent: -100, duration: 1.1, ease: 'expo.inOut' })
