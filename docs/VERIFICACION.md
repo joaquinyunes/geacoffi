@@ -10,7 +10,7 @@ Rama `integracion` con `feat/diseno-a11y` y `chore/seguridad-ci` fusionadas (sin
 | Auditoría | `npm audit --omit=dev` | **0 vulnerabilidades** (`--audit-level=high` sale con 0) |
 | Lint | `npm run lint` | sin avisos |
 | Instancia local de producción | `node tools/servir.mjs` + `node tools/verificar-instancia.mjs` | **10 / 10** controles |
-| Peso de la portada en celular (375 px) | navegador integrado | **858.078 B = 0,82 MiB** (< 1 MB), 16 pedidos |
+| Peso de la portada en celular (375 px, Slow 4G, CPU 4×) | `node tools/medir-peso.mjs` | **934.186 B = 0,89 MiB** (< 1 MB), 19 pedidos, LCP 1,05 s. *(La cifra de 0,82 MiB del 08/11 era un artefacto del navegador integrado: ver `docs/RENDIMIENTO.md`)* |
 | `/admin.html` | idem | 176.842 B |
 | Secretos en todo el historial | regex del CI sobre `git log --all -p` | 0 coincidencias (8 commits al empezar) |
 

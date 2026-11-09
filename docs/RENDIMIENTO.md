@@ -34,15 +34,19 @@ Los tiempos de carga en localhost (~0,2 s) **no representan** una red de celular
 - Fuentes: ya vienen de Google Fonts con `display=swap` y subconjunto latino; no se tocaron.
 - Sin throttling de red ni dispositivo real: no pude confirmar "< 3 s" en un celular; por bytes (0,87 MB) debería cumplirlo.
 
-## Re-medición del 08/11/2026 (G6) — build de `integracion` con las ramas fusionadas
-Mismo método (navegador integrado a 375 px, `vite build` servido con `tools/servir.mjs`, que aplica gzip y los mismos encabezados que Vercel, CSP en modo bloqueo, 9 s sin hacer scroll):
+## Re-medición del 09/11/2026 (G6) — con `tools/medir-peso.mjs`
+**Corrección de la medición del 08/11:** esa vez se midió en el navegador integrado, que no dispara el `IntersectionObserver`, y dio 0,82 MiB. Con un Edge real en modo celular los **fotogramas de `#ai` se pedían en la carga** (la sección empieza justo en el borde de la primera pantalla, y el margen de «una pantalla» la daba por visible): la portada pesaba **2,0–2,3 MiB y 38–46 pedidos**, no 0,87 MiB. Se arregló en `main.js` (ahora se piden al primer gesto de scroll/teclado o cuando `#ai` entra de verdad en pantalla; el look 3D no cambia).
 
-| Página | Pedidos | Bytes (encodedBodySize) | Resultado |
-|---|---|---|---|
-| Portada `/` (celular) | 16 | **858.078 B = 0,82 MiB** (JS principal 171.599 B gzip + 10 imágenes WebP de los planos) | ✅ **< 1 MB** |
-| `/admin.html` (panel, con sesión) | 14 | 176.842 B | ✅ |
-| Carga en localhost | — | DOMContentLoaded 310 ms · load 487 ms | no representa una red de celular |
+Script repetible (Edge/Chrome sin pantalla por DevTools; no instala nada): `node tools/medir-peso.mjs <url> [segundos] [--scroll]`. Simula 375 px, DPR 2, **Slow 4G (1,6 Mbit/s, 150 ms) y CPU 4× más lenta**, sin caché. Medido contra `tools/servir.mjs` (gzip y encabezados como Vercel):
 
-- La CSP en bloqueo no cambió el peso ni rompió el 3D: portada, detalles, carta y armar sin violaciones; el scroll 3D se ve igual.
-- **No medido:** tiempo en producción real y en red de celular. El deploy de Vercel que existe (`geacoffi`) sigue en el primer commit; hasta que el usuario cargue las variables y redeploye (G7) no hay URL de producción con esta versión. Cuando exista: `node tools/verificar-instancia.mjs <url>` y repetir esta tabla con DevTools en «Slow 4G». FCP/LCP no los expone el navegador integrado.
-- Los fotogramas de `#ai` (~61 archivos, ~3 MB en celular) se piden al acercarse a esa sección: no se re-midieron.
+| Escenario | Pedidos | Bytes transferidos | LCP / FCP | Carga (evento load) |
+|---|---|---|---|---|
+| **Antes del arreglo**, portada sin tocar nada, 15 s | 38–46 | 1,81–2,20 MiB (1,37 MB en 27 fotogramas) | 1,4–1,7 s | 6,4–8,0 s |
+| **Después**, portada sin tocar nada, 15 s | **19** | **934.186 B = 0,89 MiB (< 1 MB)** | **1,05 s** | 8,4 s |
+| Después, con scroll por la página (una corrida) | 80 | 3,88 MiB (61 fotogramas = 3,13 MB) | — | — |
+| `/admin.html` con sesión (navegador integrado) | 14 | 176.842 B | — | — |
+
+- La portada (lo que baja sin que la persona haga nada) queda **bajo 1 MB**. Los ~3 MB de fotogramas bajan **al empezar a mover la página**, en orden de importancia (0, último, cada 30, 10 y 3: ya con los primeros se ve la animación y `seqNearest` dibuja el más cercano).
+- La CSP en bloqueo no cambió el peso ni rompió el 3D.
+- La simulación de red del script es la de Lighthouse; no reemplaza un celular real. **Medición en producción real: pendiente** (el proyecto `geacoffi` de Vercel recibió el `main` nuevo el 08/11 pero sin variables; apenas el usuario cargue las de G7 y redeploye: `node tools/medir-peso.mjs https://<url> 15`).
+- Con `--scroll` el script solo dispara los fotogramas a veces (el gesto táctil sintético depende del hilo principal con CPU 4× lenta): la primera corrida los bajó, dos no. Los números «con scroll» son de esa corrida.

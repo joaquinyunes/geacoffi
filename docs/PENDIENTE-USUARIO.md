@@ -7,7 +7,7 @@ Todo lo de código y documentos de este proyecto está hecho. Lo que sigue neces
 2. **Contraseña y 2FA:** en tu computadora `node tools/clave.mjs` (pide una contraseña de ≥ 12 caracteres). Copiá `ADMIN_PASSWORD_HASH` y `ADMIN_TOTP_SECRET` a Vercel y cargá el secreto en la app de autenticación del celular.
 3. **Vercel** (proyecto `geacoffi`; el `geacofi` es el duplicado de G8): Environment Variables de Production: `MONGODB_URI`, `MONGODB_DB`, `ADMIN_PASSWORD_HASH`, `ADMIN_TOTP_SECRET`. Redeploy de `main` (o de la rama que elijas). **Atención:** el plan Hobby es «personal, no comercial»; para cobrar a un cliente hace falta Pro.
 4. Verificar: `node tools/verificar-instancia.mjs https://<tu-url>` → tiene que dar «Todo en orden».
-5. Re-medir G6 en producción (`docs/RENDIMIENTO.md`, sección de pendientes).
+5. Re-medir G6 en producción: `node tools/medir-peso.mjs https://<tu-url> 15` (ver `docs/RENDIMIENTO.md`).
 
 ## G8 — Limpieza y Fudo
 - Borrar el proyecto duplicado `geacofi` de Vercel y el Supabase `capo` (los datos viejos se descartan, ya decidido).
@@ -19,7 +19,7 @@ Todo lo de código y documentos de este proyecto está hecho. Lo que sigue neces
 - **Factura electrónica**: proveedor certificado (AFIP/ARCA) y sus credenciales.
 
 ## Para vender (V)
-- **V3** entorno de demo separado con datos verosímiles y cartel «demo» (no se hizo: lo que se muestra hoy son capturas de un entorno de prueba, etiquetadas).
+- **V3** y **V10** (demo separada y café piloto): pasos en `docs/DEMO-Y-PILOTO.md`. Hoy lo que se muestra son capturas de un entorno de prueba, etiquetadas.
 - **V6** licencia y contrato con abogado (el soporte por escrito está en `docs/PAQUETES.md`).
 - **V8** completar en `docs/venta/index.html`: contacto, video de 20–30 s y el caso real cuando exista. **Soporte** en el manual del dueño (`docs/manual/manual-dueno.html` → regenerar el PDF).
 - **V10** café piloto: validar los precios de `docs/PAQUETES.md` con un café real; precios y dólar de `docs/COSTO-3-ANOS.md` se vuelven a tomar el día de la venta.

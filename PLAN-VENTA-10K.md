@@ -16,16 +16,16 @@ Leé primero `..\PLAN-VENTA-10K.md` (veredicto, paquetes **S** y **V**). Rama: `
 - [x] **G3** 🤖 Mensajes del panel sin texto técnico («No se guardó: <error>» → mensaje humano).
 - [x] **G4** 🤖 Seguridad del panel (es lo único con login): S3 rate limit + bloqueo, S4 2FA, S5 validación y límites de subida (MIME real, tamaño, nombre de archivo), S7 registro de cambios, S2 CSP a bloquear, S8, S9, S10, S11, S13.
 - [x] **G5** 🤖 **WP-25** estado del pedido para el cliente y respaldo automático por WhatsApp con alerta si falla; adaptador Fudo **solo** si Fudo confirma que su API crea ventas (ver `ACTA-fudo.md`).
-- [ ] **G6** 🤖 (parcial: medido 0,82 MiB en el build local; falta producción, depende de G7) Re-medir peso y tiempo en producción tras el deploy (portada < 1 MB en celular).
+- [ ] **G6** 🤖 (parcial: medido 0,89 MiB y LCP 1,05 s con red Slow 4G simulada y CPU 4x; se corrigió un bug que cargaba los fotogramas al inicio; falta producción, depende de G7; script: tools/medir-peso.mjs) Re-medir peso y tiempo en producción tras el deploy (portada < 1 MB en celular).
 - [ ] 👤 **G7** Vercel: `MONGODB_URI`, `MONGODB_DB`, `ADMIN_PASSWORD`; redeploy.
 - [ ] 👤 **G8** Borrar `geacofi` (duplicado) y el Supabase `capo`; los datos viejos se descartan · preguntar a Fudo si su API crea ventas.
 
 ## B. Para vender (de `..\PLAN-VENTA-10K.md` §4)
-- [x] V1 paquetes (este es de ticket bajo: instalación + mensual, no USD 10.000 salvo que incluya pedidos/Fudo) · [x] V2 tabla a 3 años contra una web de café en suscripción · [ ] V3 demo aparte · [x] V4 despliegue repetible · [x] V5 manual del dueño (cambiar precio, evento, foto) · [ ] V7 uptime (parcial: /api/salud + workflow hechos; falta cuenta de UptimeRobot/Sentry) · [x] V8 página (con campos [COMPLETAR]) de venta · [ ] V10 café piloto
+- [x] V1 paquetes (este es de ticket bajo: instalación + mensual, no USD 10.000 salvo que incluya pedidos/Fudo) · [x] V2 tabla a 3 años contra una web de café en suscripción · [ ] V3 demo aparte (👤, pasos en docs/DEMO-Y-PILOTO.md) · [x] V4 despliegue repetible · [x] V5 manual del dueño (cambiar precio, evento, foto) · [ ] V7 uptime (parcial: /api/salud + workflow hechos; falta cuenta de UptimeRobot/Sentry) · [x] V8 página (con campos [COMPLETAR]) de venta · [ ] V10 café piloto (👤, docs/DEMO-Y-PILOTO.md)
 
 ## Hecho el 08/11/2026 (ver docs/VERIFICACION.md, docs/PENDIENTE-USUARIO.md)
 - G5: estado del pedido + respaldo por WhatsApp con código y alerta si falla. **Adaptador Fudo NO construido**: ACTA-fudo.md exige que Fudo confirme que su API crea ventas y no hay confirmación.
-- G6: portada 0,82 MiB en celular medida con el build local; **tiempo en producción sin medir** (no hay deploy de esta versión: G7 es tuyo).
+- G6: portada 0,89 MiB (934.186 B) en celular simulado, medida con tools/medir-peso.mjs (la cifra 0,82 del 08/11 era un artefacto: los fotogramas se pedían al cargar y bajó a 2,2 MiB; arreglado en main.js); **tiempo en producción sin medir** (no hay deploy de esta versión: G7 es tuyo).
 - Todo lo 👤 y los límites: docs/PENDIENTE-USUARIO.md.
 
 ## Salida
