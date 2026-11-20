@@ -21,12 +21,12 @@ Leé primero `..\PLAN-VENTA-10K.md` (veredicto, paquetes **S** y **V**). Rama: `
 - [ ] 👤 **G8** Borrar `geacofi` (duplicado) y el Supabase `capo`; los datos viejos se descartan · preguntar a Fudo si su API crea ventas.
 
 ## B. Para vender (de `..\PLAN-VENTA-10K.md` §4)
-- [x] V1 paquetes (este es de ticket bajo: instalación + mensual, no USD 10.000 salvo que incluya pedidos/Fudo) · [x] V2 tabla a 3 años contra una web de café en suscripción · [ ] V3 demo aparte (👤, pasos en docs/DEMO-Y-PILOTO.md) · [x] V4 despliegue repetible · [x] V5 manual del dueño (cambiar precio, evento, foto) · [ ] V7 uptime (parcial: /api/salud + workflow hechos; falta cuenta de UptimeRobot/Sentry) · [x] V8 página (con campos [COMPLETAR]) de venta · [ ] V10 café piloto (👤, docs/DEMO-Y-PILOTO.md)
+- [x] V1 paquetes (este es de ticket bajo: instalación + mensual, no USD 10.000 salvo que incluya pedidos/Fudo) · [x] V2 tabla a 3 años contra una web de café en suscripción · [ ] V3 demo aparte (👤, pasos en docs/DEMO-Y-PILOTO.md) · [x] V4 despliegue repetible · [x] V5 manual del dueño (cambiar precio, evento, foto) · [x] V7 uptime (/api/salud, aviso por ntfy ante errores y caídas sin cuentas, runbook; opcional 👤: UptimeRobot/Sentry) · [x] V8 página (con campos [COMPLETAR]) de venta · [ ] V10 café piloto (👤, docs/DEMO-Y-PILOTO.md)
 
-## Hecho el 08/11/2026 (ver docs/VERIFICACION.md, docs/PENDIENTE-USUARIO.md)
+## Hecho el 08/11/2026 (ver docs/VERIFICACION.md, docs/PENDIENTES-DEL-USUARIO.md)
 - G5: estado del pedido + respaldo por WhatsApp con código y alerta si falla. **Adaptador Fudo NO construido**: ACTA-fudo.md exige que Fudo confirme que su API crea ventas y no hay confirmación.
 - G6: portada 0,89 MiB (934.186 B) en celular simulado, medida con tools/medir-peso.mjs (la cifra 0,82 del 08/11 era un artefacto: los fotogramas se pedían al cargar y bajó a 2,2 MiB; arreglado en main.js); **tiempo en producción sin medir** (no hay deploy de esta versión: G7 es tuyo).
-- Todo lo 👤 y los límites: docs/PENDIENTE-USUARIO.md.
+- Todo lo 👤 y los límites: docs/PENDIENTES-DEL-USUARIO.md.
 
 ## Salida
 ☑ commits ☑ tests (58)/tsc/build/audit verdes ☑ el panel guarda y la web lo muestra ☑ portada < 1 MB en celular (local) ☑ backup restaurado (en Mongo de prueba; falta en Atlas real) ☐ café piloto

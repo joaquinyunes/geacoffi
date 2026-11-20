@@ -34,6 +34,20 @@ El panel `/admin.html` es lo único con login y con datos de clientes (pedidos c
 6. **Foto: cualquier navegador podía mentir el tipo** → ya se decidía por bytes; ahora además la respuesta lleva `nosniff` y `CSP default-src 'none'; sandbox`, y se exige firma PNG completa.
 7. **IP falsificable** detrás de proxies que agregan `X-Forwarded-For` (Render): en Vercel se usan `x-vercel-forwarded-for` / `x-real-ip` (no falsificables). En Render el límite por IP se puede esquivar; por eso existe el tope general del login.
 
+## Revisión adversaria (19/11/2026): ataques probados y arreglados
+Se escribió primero un test por cada ataque (`server/seguridad.test.ts`, 10 tests rojos) y después se arregló. Lo que apareció:
+1. **Fuerza bruta en paralelo (alto):** el login contaba el intento *después* de mirar la contraseña; 1.000 pedidos simultáneos se probaban todos antes de que el contador subiera. Ahora se cuenta antes; con 20 en paralelo pasan como mucho 5. Un acierto devuelve su golpe al tope general.
+2. **Sesiones sobrevivían a un cambio de contraseña o de 2FA (medio):** cada sesión guarda una huella de las credenciales vigentes; rotarlas las invalida a todas.
+3. **Carrera al cambiar el estado de un pedido (medio):** «aceptar» y «rechazar» a la vez daban 200 los dos. Ahora el segundo recibe 409.
+4. **Campos de más en el contenido (medio):** el panel aceptaba y el sitio aplicaba cualquier clave (`chat`, `instagram`, `opciones`…), que terminan en `href` y en el carrito. Lista blanca de campos en el servidor (`server/foto.ts`) **y** en el cliente (`negocio.js`, `tomar()`).
+5. **Fotos con la forma `/api/foto?id=` pero de otro dominio (bajo):** se aceptaban; ahora solo del host propio (o de `ORIGENES_PERMITIDOS`). El panel guarda las fotos sin dominio, así no se rompen si el sitio cambia de dirección.
+6. **Fotos huérfanas llenando Atlas gratis (medio):** cada foto reemplazada quedaba para siempre (512 MB de tope). Al guardar se borran las que ningún contenido usa y tienen más de un día; tope de 200 fotos.
+7. **2FA obligatorio solo en Vercel (medio):** ahora también con `NODE_ENV=production` (Render u otro host).
+8. **Sin topes en la consulta del estado ni a nivel general de pedidos (bajo):** 300 consultas / 10 min por IP; 300 pedidos / hora en total (el panel del local no se llena aunque cambie la IP).
+9. **Clave de respaldo corta:** `BACKUP_CLAVE` exige ≥ 16 caracteres.
+Revisado y **sin hallazgos**: CSRF (cookie SameSite=Lax + `x-gc`), IDOR (los pedidos se consultan por un id de 122 bits; la lista exige sesión), XSS almacenado (todo lo que viene de clientes y de la base pasa por `esc()` antes de `innerHTML`; además la CSP bloquea scripts y manejadores en línea), reuso de un código 2FA (una sola vez, también con carrera), inyección de operadores Mongo, JSON anidado (400), cabecera `x-forwarded-proto` falsa (solo afecta la cookie propia), permisos entre locales (el sistema es de un solo local por instancia: no hay datos de otros locales que cruzar) y webhooks / idempotencia (no hay webhooks ni pagos en este proyecto; se revisan cuando se agregue Mercado Pago).
+**No cubierto:** roles múltiples (una sola cuenta) y el total del pedido, que lo manda el navegador y el local confirma el precio final (no hay cobro online todavía).
+
 ## Riesgos que quedan (decisión de quien instala)
 - **Un solo usuario de base de datos con permiso total**. Para que el registro de cambios sea de verdad inborrable desde la app, crear en Atlas un rol propio: `insert` + `find` sobre `auditoria`, y `readWrite` sobre el resto; y usar ese usuario en `MONGODB_URI`.
 - **Atlas M0 (gratis) no hace backups**: por eso existe `tools/backup.mjs`. El workflow guarda el archivo (cifrado con `BACKUP_CLAVE`) como artefacto de GitHub 30 días. **El repo hoy es público**: los artefactos de repos públicos se pueden descargar con una cuenta de GitHub. El archivo está cifrado (AES-256-GCM), pero lo correcto es hacer el repo privado o correr el respaldo desde la computadora de quien mantiene.
@@ -43,4 +57,4 @@ El panel `/admin.html` es lo único con login y con datos de clientes (pedidos c
 ## Prueba de restauración (S10)
 - **6/11/2026, automática** (`tools/respaldo.test.mjs`, en cada `npm test`): se cargan contenido, una foto binaria y pedidos en una base; se hace el respaldo cifrado; se verifica que el archivo no contiene texto legible, que una clave equivocada se rechaza, que la restauración en otra base devuelve los documentos **iguales** (incluidos los bytes de la foto), que no se restauran las sesiones y que **no pisa** una base que ya tiene datos. Resultado: pasa.
 - **6/11/2026, a mano con la CLI** sobre un Mongo local: `tools/backup.mjs` → archivo cifrado de 0,2 KB → `tools/restaurar.mjs` → `{ pedidos: 1, contenido: 1 }`; el segundo intento sobre la misma base se negó. Resultado: ok.
-- **Pendiente 👤:** repetirlo sobre la base real de Atlas cuando exista (ver `docs/PENDIENTE-USUARIO.md`).
+- **Pendiente 👤:** repetirlo sobre la base real de Atlas cuando exista (ver `docs/PENDIENTES-DEL-USUARIO.md`).

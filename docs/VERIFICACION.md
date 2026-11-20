@@ -1,10 +1,10 @@
-# Verificación (08/11/2026) — números reales, corridos al cerrar
+# Verificación (19/11/2026) — números reales, corridos al cerrar
 
 Rama `integracion` con `feat/diseno-a11y` y `chore/seguridad-ci` fusionadas (sin conflictos).
 
 | Control | Comando | Resultado |
 |---|---|---|
-| Tests | `npx vitest run` | **58 / 58** en 8 archivos (antes de esta tanda: 29) |
+| Tests | `npx vitest run` | **69 / 69** en 10 archivos (arrancamos en 29; 58 el 08/11; +11 de la revisión adversaria y el aviso por ntfy) |
 | Tipos | `npx tsc --noEmit` | 0 errores |
 | Build | `npm run build` | ✓ (JS principal 632 kB, 172,85 kB gzip) |
 | Auditoría | `npm audit --omit=dev` | **0 vulnerabilidades** (`--audit-level=high` sale con 0) |
@@ -17,8 +17,8 @@ Rama `integracion` con `feat/diseno-a11y` y `chore/seguridad-ci` fusionadas (sin
 ## Probado en el navegador (G2), contra el build servido con la CSP en bloqueo
 Login con clave mala (mensaje «La contraseña no es correcta.») y buena; con 2FA, código de la app; cookie `HttpOnly` (no visible desde JS); editar precio, WhatsApp y horarios; agregar un evento; **subir una foto** por el input real (se convierte a WebP, el servidor la guarda y la sirve); Guardar → la carta de la web muestra el precio nuevo (`$1.500`); registro de cambios con el antes y el después; un pedido armado en la carta sale por WhatsApp con el código (`Pedido #5B5B`), aparece en el panel, se **acepta** y el ticket del cliente cambia a «Aceptado» (consulta cada 15 s); si el registro falla (red cortada simulada) el ticket muestra la alerta y el WhatsApp sale igual.
 
-## Qué cubren los 58 tests
-`server/contenido.test.ts` (guardar exige sesión y `x-gc`, validación, operadores `$`, auditoría, fotos por bytes, 3 MB) · `server/login.test.ts` (TOTP contra el vector de la RFC 6238, un código no vale dos veces, bloqueo tras 5 fallos con `Retry-After`, cierre en todos los dispositivos, cookie, hash scrypt, `tools/clave.mjs`, clave corta rechazada) · `server/pedido.test.ts` (estados y transiciones, rechazo con motivo, id del cliente, abuso, `/api/salud`) · `mensajes.test.js` (sin texto técnico) · `pedido-texto.test.js` · `tools/respaldo.test.mjs` (respaldo cifrado → restauración).
+## Qué cubren los 69 tests
+`server/contenido.test.ts` (guardar exige sesión y `x-gc`, validación, operadores `$`, auditoría, fotos por bytes, 3 MB) · `server/login.test.ts` (TOTP contra el vector de la RFC 6238, un código no vale dos veces, bloqueo tras 5 fallos con `Retry-After`, cierre en todos los dispositivos, cookie, hash scrypt, `tools/clave.mjs`, clave corta rechazada) · `server/pedido.test.ts` (estados y transiciones, rechazo con motivo, id del cliente, abuso, `/api/salud`) · `mensajes.test.js` (sin texto técnico) · `pedido-texto.test.js` · `tools/respaldo.test.mjs` (respaldo cifrado → restauración) · `server/seguridad.test.ts` (fuerza bruta en paralelo, sesiones vs. cambio de credenciales, `NODE_ENV=production` sin 2FA, carrera aceptar/rechazar, topes por IP y general, lista blanca de campos, fotos de otro dominio, JSON anidado, fotos huérfanas) · `server/alerta.test.ts` (aviso por ntfy sin datos del cliente y con tope).
 
 ## Prueba de despliegue de cero (V4)
 Clon limpio de la rama (`git clone`) → `npm ci` 11 s → `npm run build` 7 s → `tools/servir.mjs` (Mongo en memoria) → `tools/verificar-instancia.mjs`: **10 / 10 controles, 21 s en total** (con la caché de npm caliente). La parte en nube (Atlas, Vercel, dominio) depende de las cuentas del cliente y se estima en menos de 1 hora (`docs/DESPLIEGUE-NUEVO-CLIENTE.md`); **no se probó contra Atlas/Vercel reales**.

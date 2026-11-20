@@ -1,6 +1,7 @@
 # Monitoreo y qué hacer si se cae (V7)
 
 ## Qué hay armado
+- **Aviso al celular sin cuentas (ntfy):** con `ALERTA_URL=https://ntfy.sh/<tema-secreto>` en Vercel, cada error 500 del servidor manda un aviso con el nombre del error y la ruta (nunca datos de clientes), máximo uno cada 10 minutos por ruta (`server/alerta.ts`, con test). El workflow `Monitoreo` usa el mismo valor (secreto del repo `ALERTA_URL`) para avisar cuando `/api/salud` no responde. En el celular: app ntfy → suscribirse al mismo tema.
 - **`/api/salud`**: responde 200 `{ ok: true }` si la función y la base están vivas, 503 si no. No expone datos.
 - **Workflow `Monitoreo`** (`.github/workflows/uptime.yml`): cada 15 minutos pide `/api/salud`. Si falla, el job queda en rojo y GitHub avisa por mail al dueño del repo. Requiere la variable `SITIO_URL` (Settings → Variables → Actions). *Límite:* GitHub puede demorar las ejecuciones programadas varios minutos y desactiva los workflows de repos sin actividad en 60 días.
 - **Vercel no duerme las funciones** del plan Pro y el front es estático. Atlas Free **se pausa tras 60 días sin actividad**: con el monitoreo pidiendo la base cada 15 minutos no pasa.
@@ -8,7 +9,7 @@
 
 ## Qué falta (👤, requiere cuentas)
 - **UptimeRobot** (u otro) apuntando a `/api/salud` con aviso por WhatsApp/mail al soporte — más confiable que el workflow (cada 5 min en el plan gratis). Crear la cuenta lo hace quien mantiene.
-- **Errores a un panel (Sentry o similar):** no se instaló (necesita DSN de una cuenta). Mientras tanto, los errores del servidor quedan en **Vercel → Logs** (`console.error` de `ruta()`), y los intentos fallidos y cambios en el registro del panel. Cuando haya cuenta: agregar el SDK en `server/http.ts` (`ruta`), un solo lugar.
+- **Sentry:** no se instaló (necesita DSN de una cuenta). Alcanza con lo de arriba: el detalle de los errores queda en **Vercel → Logs** y los intentos fallidos y cambios, en el registro del panel. Si algún día se quiere Sentry, el único lugar a tocar es `ruta()` en `server/http.ts`.
 
 ## Runbook: «se cayó»
 1. **¿Abre la portada?** Sí → el problema es solo de funciones/base. No → Vercel: ver https://www.vercel-status.com y el último deploy (Deployments → «Rollback» al anterior que funcionaba).
