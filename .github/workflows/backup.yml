@@ -26,7 +26,7 @@ jobs:
           MONGODB_URI: ${{ secrets.MONGODB_URI }}
           MONGODB_DB: ${{ vars.MONGODB_DB || 'geacoffi' }}
           BACKUP_CLAVE: ${{ secrets.BACKUP_CLAVE }}
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: respaldo-geacoffi
           path: respaldos/*.cifrado.json.gz
