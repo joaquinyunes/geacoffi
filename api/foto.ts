@@ -9,7 +9,7 @@ import { exigirAdmin } from '../server/sesion.js';
 
 interface Foto { _id: string; tipo: string; data: Binary; creado: Date }
 
-const MAX_BYTES = 3_000_000, MAX_FOTOS = 500;
+const MAX_BYTES = 3_000_000, MAX_FOTOS = 200; // el panel las achica a ~100 KB; 200 caben de sobra en los 512 MB de Atlas gratis
 
 export default ruta(async (req, res) => {
   const col = await coleccion<Foto>('fotos');

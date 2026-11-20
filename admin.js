@@ -246,11 +246,14 @@ async function guardar(boton) {
   boton.disabled = true
   mensaje('Guardando…')
   const productos = Object.fromEntries(estado.productos.map(({ id, ...resto }) => [id, { ...resto, foto: resto.foto || undefined }]))
+  // las fotos subidas se guardan sin el dominio (/api/foto?id=…): así siguen andando si el sitio cambia de dirección
+  const rel = (u) => (typeof u === 'string' ? u.replace(/^https?:\/\/[^/]+(?=\/api\/foto\?id=)/, '') : u)
+  for (const p of Object.values(productos)) p.foto = rel(p.foto)
   const contenido = {
     negocio: estado.negocio,
     productos,
-    eventos: estado.eventos.filter((e) => e.fecha && e.titulo),
-    visitas: estado.visitas.filter((v) => v.src),
+    eventos: estado.eventos.filter((e) => e.fecha && e.titulo).map((e) => ({ ...e, foto: rel(e.foto) })),
+    visitas: estado.visitas.filter((v) => v.src).map((v) => ({ ...v, src: rel(v.src) })),
   }
   try {
     await api('contenido', { metodo: 'PUT', ...json(contenido) })

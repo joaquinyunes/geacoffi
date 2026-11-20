@@ -23,6 +23,7 @@ export default ruta(async (req, res) => {
       const filas = await col.find().sort({ creado: -1 }).limit(50).toArray();
       return json(res, 200, filas.map(({ _id, ...p }) => ({ id: _id, codigo: codigoCorto(_id), ...p })));
     }
+    if (await limitar(`pedido-estado:${ip(req)}`, 300, 600)) return json(res, 429, { error: 'Consultaste muchas veces seguidas. Esperá unos minutos.' });
     const id = url.searchParams.get('id') ?? '';
     const p = /^[a-f0-9-]{36}$/.test(id) ? await col.findOne({ _id: id }, { projection: { estado: 1, motivo: 1, actualizado: 1 } }) : null;
     if (!p) return json(res, 404, { error: 'No encontramos ese pedido.' });
@@ -31,6 +32,8 @@ export default ruta(async (req, res) => {
 
   if (req.method === 'POST') {
     if (await limitar(`pedido:${ip(req)}`, 10, 600)) return json(res, 429, { error: 'Mandaste varios pedidos seguidos. Esperá unos minutos o escribinos por WhatsApp.' });
+    // tope general: si alguien reparte el abuso entre muchas IPs, el panel del local no se llena de basura (y el cliente real sigue pudiendo escribir por WhatsApp)
+    if (await limitar('pedido:global', 300, 3600)) return json(res, 429, { error: 'Hay muchos pedidos en este momento. Escribinos por WhatsApp.' });
     const cuerpo = await leerJson(req, res, 20_000);
     if (cuerpo === undefined) return;
     const pedido = validarPedido(cuerpo);
@@ -55,7 +58,8 @@ export default ruta(async (req, res) => {
     const actual = await col.findOne({ _id: id });
     if (!actual) return json(res, 404, { error: 'No encontramos ese pedido.' });
     if (!SIGUIENTES[actual.estado].includes(estado)) return json(res, 409, { error: `Este pedido ya está «${actual.estado}»: no se puede pasar a «${estado}».` });
-    await col.updateOne({ _id: id, estado: actual.estado }, { $set: { estado, motivo: estado === 'rechazado' ? motivo : '', actualizado: new Date() } });
+    const r = await col.updateOne({ _id: id, estado: actual.estado }, { $set: { estado, motivo: estado === 'rechazado' ? motivo : '', actualizado: new Date() } });
+    if (!r.modifiedCount) return json(res, 409, { error: 'Este pedido cambió justo ahora desde otra pantalla. Recargá la lista.' });
     await registrar(req, `pedido ${codigoCorto(id)}`, [{ campo: 'estado', antes: actual.estado, despues: estado }]);
     return json(res, 200, { ok: true, estado });
   }

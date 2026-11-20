@@ -1,5 +1,5 @@
 import { ip, json, leerJson, ruta } from '../server/http.js';
-import { bloqueado, limpiar, sumar } from '../server/limite.js';
+import { devolver, limpiar, sumar } from '../server/limite.js';
 import { registrar } from '../server/auditoria.js';
 import { abrirSesion, cerrarSesion, claveCorrecta, estadoConfig, exigirAdmin, hayAdmin, segundoPasoCorrecto } from '../server/sesion.js';
 
@@ -24,8 +24,10 @@ export default ruta(async (req, res) => {
   if (estadoConfig() !== 'ok') return json(res, 503, { error: 'El panel todavía no está configurado. Avisá a quien instaló la web.' });
 
   // Bloqueo temporal: por IP y, aparte, un tope general para ataques repartidos entre muchas IPs.
+  // Cada intento se cuenta ANTES de mirar la contraseña: si se contara después, mil pedidos en paralelo se probarían todos antes de que el contador subiera.
   const claveIp = `login:${ip(req)}`;
-  const bloqueo = Math.max(await bloqueado(claveIp, INTENTOS), await bloqueado('login:global', GLOBAL));
+  const [porIp, general] = await Promise.all([sumar(claveIp, VENTANA_S), sumar('login:global', VENTANA_S)]);
+  const bloqueo = Math.max(porIp.n > INTENTOS ? porIp.reintentoS : 0, general.n > GLOBAL ? general.reintentoS : 0);
   if (bloqueo) { res.setHeader('Retry-After', bloqueo); return json(res, 429, { error: espera(bloqueo) }); }
 
   const cuerpo = await leerJson(req, res, 2_000);
@@ -33,11 +35,10 @@ export default ruta(async (req, res) => {
   const { clave, codigo } = (cuerpo ?? {}) as { clave?: unknown; codigo?: unknown };
   const bien = typeof clave === 'string' && claveCorrecta(clave) && await segundoPasoCorrecto(typeof codigo === 'string' ? codigo.trim() : '');
   if (!bien) {
-    await Promise.all([sumar(claveIp, VENTANA_S), sumar('login:global', VENTANA_S)]);
     await new Promise(r => setTimeout(r, 700)); // frena un poco los intentos al azar
     return json(res, 401, { error: process.env.ADMIN_TOTP_SECRET ? 'La contraseña o el código no coinciden.' : 'La contraseña no es correcta.' });
   }
-  await limpiar(claveIp);
+  await Promise.all([limpiar(claveIp), devolver('login:global')]);
   await abrirSesion(req, res);
   await registrar(req, 'entró al panel');
   json(res, 200, { ok: true });

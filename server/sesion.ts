@@ -7,7 +7,7 @@ export const MIN_CLAVE = 12;
 const DURACION_S = 12 * 3600;
 const COOKIE = 'gc_sesion';
 
-interface Sesion { _id: string; exp: Date; creado: Date; ip: string }
+interface Sesion { _id: string; exp: Date; creado: Date; ip: string; cfg: string }
 
 const sha = (s: string) => createHash('sha256').update(s).digest();
 const igual = (a: string, b: string) => timingSafeEqual(sha(a), sha(b));
@@ -24,10 +24,10 @@ async function sesiones() {
 
 /** 'ok' si hay clave usable; si no, el motivo. La clave puede venir como hash scrypt (ADMIN_PASSWORD_HASH, recomendado) o en claro (ADMIN_PASSWORD, ≥ 12 caracteres). */
 export function estadoConfig(): 'ok' | 'sin-clave' | 'clave-corta' | 'sin-2fa' {
-  const { ADMIN_PASSWORD_HASH: hash, ADMIN_PASSWORD: plano, ADMIN_TOTP_SECRET: totp, VERCEL_ENV, ADMIN_SIN_2FA } = process.env;
+  const { ADMIN_PASSWORD_HASH: hash, ADMIN_PASSWORD: plano, ADMIN_TOTP_SECRET: totp, VERCEL_ENV, NODE_ENV, ADMIN_SIN_2FA } = process.env;
   if (!hash && !plano) return 'sin-clave';
   if (!hash && plano!.length < MIN_CLAVE) return 'clave-corta';
-  if (VERCEL_ENV === 'production' && !totp && ADMIN_SIN_2FA !== '1') return 'sin-2fa';
+  if ((VERCEL_ENV === 'production' || NODE_ENV === 'production') && !totp && ADMIN_SIN_2FA !== '1') return 'sin-2fa';
   return 'ok';
 }
 
@@ -57,12 +57,15 @@ export async function segundoPasoCorrecto(dado: string): Promise<boolean> {
   try { await (await coleccion<{ _id: string; creado: Date }>('totp_usados')).insertOne({ _id: String(paso), creado: new Date() }); return true; } catch { return false; }
 }
 
+/** Huella de la contraseña y del secreto 2FA vigentes: si se cambian, las sesiones abiertas dejan de valer. */
+const huellaConfig = () => createHash('sha256').update(`${process.env.ADMIN_PASSWORD_HASH ?? process.env.ADMIN_PASSWORD ?? ''}|${process.env.ADMIN_TOTP_SECRET ?? ''}`).digest('hex').slice(0, 16);
+
 const tokenDe = (req: Req) => /(?:^|;\s*)gc_sesion=([\w-]+)/.exec(req.headers.cookie ?? '')?.[1];
 
 /** Crea la sesión y pone la cookie (HttpOnly, SameSite=Lax, Secure detrás de https). */
 export async function abrirSesion(req: Req, res: Res) {
   const token = randomBytes(32).toString('base64url');
-  await (await sesiones()).insertOne({ _id: sha(token).toString('hex'), exp: new Date(Date.now() + DURACION_S * 1000), creado: new Date(), ip: ip(req) });
+  await (await sesiones()).insertOne({ _id: sha(token).toString('hex'), exp: new Date(Date.now() + DURACION_S * 1000), creado: new Date(), ip: ip(req), cfg: huellaConfig() });
   res.setHeader('Set-Cookie', cookie(req, token, DURACION_S));
 }
 
@@ -71,7 +74,7 @@ const cookie = (req: Req, valor: string, edad: number) =>
 
 export async function hayAdmin(req: Req): Promise<boolean> {
   const token = tokenDe(req);
-  return Boolean(token && await (await sesiones()).findOne({ _id: sha(token).toString('hex'), exp: { $gt: new Date() } }));
+  return Boolean(token && await (await sesiones()).findOne({ _id: sha(token).toString('hex'), exp: { $gt: new Date() }, cfg: huellaConfig() }));
 }
 
 /** Cierra esta sesión, o todas (en todos los dispositivos). */

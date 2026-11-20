@@ -8,6 +8,8 @@ const { MONGODB_URI, MONGODB_DB = 'geacoffi', BACKUP_CLAVE } = process.env;
 if (!MONGODB_URI) { console.error('Falta MONGODB_URI.'); process.exit(1); }
 if (process.env.CI && !BACKUP_CLAVE) { console.error('En CI el respaldo tiene que ir cifrado: falta el secreto BACKUP_CLAVE.'); process.exit(1); }
 
+if (BACKUP_CLAVE && BACKUP_CLAVE.length < 16) { console.error('BACKUP_CLAVE tiene que tener al menos 16 caracteres.'); process.exit(1); }
+
 const carpeta = process.argv[2] || 'respaldos';
 mkdirSync(carpeta, { recursive: true });
 const archivo = join(carpeta, `${MONGODB_DB}-${new Date().toISOString().slice(0, 10)}${BACKUP_CLAVE ? '.cifrado' : ''}.json.gz`);

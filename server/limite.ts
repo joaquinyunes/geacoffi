@@ -35,4 +35,7 @@ export async function limitar(clave: string, max: number, ventanaS: number): Pro
   return n > max ? reintentoS : 0;
 }
 
+/** Devuelve un golpe (un acierto no debe gastar el tope general). */
+export async function devolver(clave: string) { await (await col()).updateOne({ _id: clave, n: { $gt: 0 } }, { $inc: { n: -1 } }); }
+
 export async function limpiar(clave: string) { await (await col()).deleteOne({ _id: clave }); }

@@ -69,13 +69,14 @@ export const VISITAS = []
   shortcut: el panel edita datos, precios, nombres y fotos de los productos de arriba, eventos y visitas; productos nuevos y los textos de la carta siguen en el código.
 */
 function aplicar(c) {
+  // Solo se toman los campos que edita el panel: lo demás (chat, instagram, dirección…) va a enlaces y no se puede pisar desde la base.
+  const tomar = (destino, origen, claves) => { for (const k of claves) if (origen && k in origen) destino[k] = origen[k] }
   if (c.negocio) {
-    const { envio, pedidos, ...resto } = c.negocio
-    Object.assign(NEGOCIO, resto)
-    Object.assign(NEGOCIO.envio, envio)
-    Object.assign(NEGOCIO.pedidos, pedidos)
+    tomar(NEGOCIO, c.negocio, ['telefono', 'horarios', 'respuesta'])
+    tomar(NEGOCIO.envio, c.negocio.envio, ['activo', 'zona', 'costo', 'minimo'])
+    tomar(NEGOCIO.pedidos, c.negocio.pedidos, ['desde', 'hasta'])
   }
-  for (const p of PRODUCTOS) Object.assign(p, c.productos?.[p.id])
+  for (const p of PRODUCTOS) tomar(p, c.productos?.[p.id], ['nombre', 'precio', 'foto'])
   if (c.eventos) EVENTOS.splice(0, EVENTOS.length, ...c.eventos)
   if (c.visitas) VISITAS.splice(0, VISITAS.length, ...c.visitas)
   // las fotos que están escritas a mano en el HTML
