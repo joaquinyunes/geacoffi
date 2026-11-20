@@ -1,4 +1,5 @@
 import type { IncomingMessage as Req, ServerResponse as Res } from 'node:http';
+import { alertar } from './alerta.js';
 
 export type { Req, Res };
 
@@ -63,6 +64,7 @@ export function ruta(f: (req: Req, res: Res) => Promise<void>) {
     } catch (error) {
       if (error instanceof CuerpoGrande) return json(res, 413, { error: 'Lo que enviaste es demasiado grande.' });
       console.error(error);
+      await alertar(new URL(req.url ?? '/', 'http://x').pathname, error);
       json(res, 500, { error: 'Hubo un problema de nuestro lado. Probá de nuevo en un rato.' });
     }
   };

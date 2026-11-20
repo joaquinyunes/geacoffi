@@ -19,3 +19,11 @@ jobs:
         run: |
           if [ -z "$SITIO_URL" ]; then echo "Falta la variable SITIO_URL"; exit 1; fi
           curl --fail --silent --show-error --max-time 20 --retry 2 --retry-delay 10 "$SITIO_URL/api/salud"
+      # Aviso al celular (app ntfy, sin cuenta): cargar el secreto ALERTA_URL = https://ntfy.sh/<tema-secreto>
+      - name: Avisar la caída
+        if: failure()
+        env:
+          ALERTA_URL: ${{ secrets.ALERTA_URL }}
+          SITIO_URL: ${{ vars.SITIO_URL }}
+        run: |
+          if [ -n "$ALERTA_URL" ]; then curl --silent --max-time 15 -H "Title: GeaCofi no responde" -H "Priority: urgent" -d "$SITIO_URL/api/salud falló" "$ALERTA_URL"; fi
