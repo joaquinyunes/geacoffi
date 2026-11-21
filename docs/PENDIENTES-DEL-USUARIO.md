@@ -26,7 +26,7 @@ Todo lo que se puede hacer sin tus cuentas está hecho y verificado (69 tests, t
 - **Factura electrónica:** proveedor certificado (ARCA) y sus credenciales.
 
 ## 5. Para vender
-- **V3 y V10** (demo separada y café piloto): pasos en `docs/DEMO-Y-PILOTO.md`.
+- **V3 y V10** (demo separada y café piloto): pasos en `docs/DEMO-Y-PILOTO.md`; checklist y contrato borrador (para el abogado) en `docs/KIT-PILOTO.md`. El «modo demo» con cartel todavía no existe: se hace al armar la demo (V3).
 - **V6** licencia y contrato con abogado (el soporte por escrito propuesto está en `docs/PAQUETES.md`). **S12** política de privacidad y términos (Ley 25.326).
 - **V8** completar en `docs/venta/index.html`: contacto, video de 20–30 s y caso real. **Manual:** poner el contacto de soporte en `docs/manual/manual-dueno.html` y regenerar el PDF.
 - **Validar precios** (`docs/PAQUETES.md`) con un café real; precios y dólar de `docs/COSTO-3-ANOS.md` se vuelven a tomar el día de la venta (el producto es de ticket bajo: no justifica USD 10.000 por sí solo).

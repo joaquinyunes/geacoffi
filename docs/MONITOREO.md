@@ -19,3 +19,10 @@
 5. **Se borró contenido**: `docs/SEGURIDAD.md` → restauración: `node tools/restaurar.mjs <respaldo>` en una **base nueva**, verificar y recién ahí cambiar `MONGODB_DB`.
 6. **Mientras tanto**: los clientes siguen escribiendo por WhatsApp (el pedido siempre sale por WhatsApp; el panel es un extra). Avisarle a la dueña que atienda por ahí.
 7. Anotar hora de inicio, causa y arreglo para el informe del mes.
+
+## UptimeRobot en 5 pasos (👤, plan gratis)
+1. Crear cuenta en uptimerobot.com → **Add New Monitor** → tipo **HTTP(s)**.
+2. URL: `https://<tu-sitio>/api/salud`; intervalo 5 minutos; **Keyword** `"ok":true` (así avisa también si responde 200 pero la base falla).
+3. En **Alert Contacts** sumar tu mail y el del soporte; opcional el webhook de ntfy (`https://ntfy.sh/<tema-secreto>`).
+4. Probar apagando algo a propósito (por ejemplo, una URL con la ruta mal) y ver que llega el aviso.
+5. Anotar el monitor en la checklist de entrega (`KIT-PILOTO.md`).
